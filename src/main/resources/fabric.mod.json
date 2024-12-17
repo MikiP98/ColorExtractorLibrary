@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "color-extractor-library",
+	"version": "${version}",
+	"name": "Color Extractor Library",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/color-extractor-library/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.mikip98.cel.ColorExtractorLibrary"
+		],
+		"client": [
+			"io.github.mikip98.cel.ColorExtractorLibraryClient"
+		]
+	},
+	"mixins": [
+		"color-extractor-library.mixins.json",
+		{
+			"config": "color-extractor-library.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
