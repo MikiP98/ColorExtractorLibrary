@@ -1,6 +1,8 @@
 package io.github.mikip98.cel.api;
 
 import io.github.mikip98.cel.enums.AVGTypes;
+import io.github.mikip98.cel.assetloading.AssetPathResolver;
+import org.jetbrains.annotations.NotNull;
 
 // This is the only class that mods using this lib should use/the only one that guarantees stability
 public class ColorExtractorAPI {
@@ -8,19 +10,91 @@ public class ColorExtractorAPI {
     // ----------------------- COLOR AVERAGE EXTRACTORS -----------------------
     // ------------------------------------------------------------------------
 
-    public static int[] getAverageColorForBlockstate(String ModID, String BlockstateID, float weightedness) {
-        return getAverageColorForBlockstate(ModID, BlockstateID, weightedness, AVGTypes.WEIGHTED_ARITHMETIC);
+    /**
+     * Returns the average color for a blockstate.
+     *
+     * @param modID the ID of the mod that owns the blockstate
+     * @param blockstateID the ID of the blockstate
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID) {
+        return getAverageColorForBlockstate(modID, blockstateID, 1.0f, AVGTypes.WEIGHTED_ARITHMETIC);
     }
-    public static int[] getAverageColorForBlockstate(String ModID, String BlockstateID, float weightedness, AVGTypes AVGType) {
+    /**
+     * Returns the average color for a blockstate.
+     *
+     * @param modID the ID of the mod that owns the blockstate
+     * @param blockstateID the ID of the blockstate
+     * @param avgType the type of average to use for the color extraction
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, AVGTypes avgType) {
+        return getAverageColorForBlockstate(modID, blockstateID, 1.0f, avgType);
+    }
+    /**
+     * Returns the average color for a blockstate.
+     *
+     * @param modID the ID of the mod that owns the blockstate
+     * @param blockstateID the ID of the blockstate
+     * @param weightedness the weightedness of the color extraction; should be between 0 and 1
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, float weightedness) {
+        return getAverageColorForBlockstate(modID, blockstateID, weightedness, AVGTypes.WEIGHTED_ARITHMETIC);
+    }
+    /**
+     * Returns the average color for a blockstate using the specified average type.
+     *
+     * @param modID the ID of the mod that owns the blockstate
+     * @param blockstateID the ID/name of the blockstate
+     * @param weightedness the weightedness of the color extraction; should be between 0 and 1
+     * @param avgType the type of average to use for the color extraction
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, float weightedness, AVGTypes avgType) {
+        AssetPathResolver.cachePathsIfNotCached();
+        weightedness = validateWeightedness(weightedness);
         return new int[0];
     }
 
-    public static int[] getAverageColorForBlockModel(String ModID, String ModelID, float weightedness) {
+
+    /**
+     * Returns the average color for a block model.
+     *
+     * @param modID the ID of the mod that owns the block model
+     * @param modelID the ID/name of the block model
+     * @param weightedness the weightedness of the color extraction, should be between 0 and 1
+     * @param avgType the type of average to use for the color extraction
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockModel(String modID, String modelID, float weightedness, AVGTypes avgType) {
+        AssetPathResolver.cachePathsIfNotCached();
+        weightedness = validateWeightedness(weightedness);
         return new int[0];
     }
 
-    public static int[] getAverageColorForBlockTexture(String ModID, String TextureID, AVGTypes AVGType) {
+
+    /**
+     * Returns the average color for a texture.
+     *
+     * @param modID the ID of the mod that owns the texture
+     * @param textureID the ID/name of the texture
+     * @param avgType the type of average to use for the color extraction
+     * @return the average color as an array of RGB values
+     */
+    public static int @NotNull [] getAverageColorForBlockTexture(String modID, String textureID, AVGTypes avgType) {
+        AssetPathResolver.cachePathsIfNotCached();
         return new int[0];
+    }
+
+    /**
+     * Validates the weightedness value to ensure it is between 0 and 1.
+     *
+     * @param weightedness the weightedness value to validate
+     * @return the validated weightedness value clamped between 0 and 1
+     */
+    public static float validateWeightedness(float weightedness) {
+        return Math.max(Math.min(weightedness, 1), 0);  // REMEMBER: Switch to Math.clamp() on MC 1.21+ (JAVA 21+)
     }
 
 
