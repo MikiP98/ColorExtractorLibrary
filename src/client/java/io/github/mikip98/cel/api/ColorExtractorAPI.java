@@ -7,6 +7,29 @@ import org.jetbrains.annotations.NotNull;
 // This is the only class that mods using this lib should use/the only one that guarantees stability
 public class ColorExtractorAPI {
     // ------------------------------------------------------------------------
+    // --------------------------------- SETUP --------------------------------
+    // ------------------------------------------------------------------------
+
+    public static void cachePathsIfNotCached() {
+        AssetPathResolver.cachePathsIfNotCached();
+    }
+
+    public static void updatePathCache() {
+        AssetPathResolver.updatePathCache();
+    }
+
+    public static void clearPathCache() {
+        AssetPathResolver.clearPathCache();
+    }
+
+    // Prevents the clearing of the path cache
+    public static void lockPathCache(boolean isCommandProof, int time, int code) {
+
+    }
+
+
+
+    // ------------------------------------------------------------------------
     // ----------------------- COLOR AVERAGE EXTRACTORS -----------------------
     // ------------------------------------------------------------------------
 
@@ -52,7 +75,6 @@ public class ColorExtractorAPI {
      * @return the average color as an array of RGB values
      */
     public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, float weightedness, AVGTypes avgType) {
-        AssetPathResolver.cachePathsIfNotCached();
         weightedness = validateWeightedness(weightedness);
         return new int[0];
     }
@@ -68,7 +90,6 @@ public class ColorExtractorAPI {
      * @return the average color as an array of RGB values
      */
     public static int @NotNull [] getAverageColorForBlockModel(String modID, String modelID, float weightedness, AVGTypes avgType) {
-        AssetPathResolver.cachePathsIfNotCached();
         weightedness = validateWeightedness(weightedness);
         return new int[0];
     }
@@ -83,7 +104,6 @@ public class ColorExtractorAPI {
      * @return the average color as an array of RGB values
      */
     public static int @NotNull [] getAverageColorForBlockTexture(String modID, String textureID, AVGTypes avgType) {
-        AssetPathResolver.cachePathsIfNotCached();
         return new int[0];
     }
 

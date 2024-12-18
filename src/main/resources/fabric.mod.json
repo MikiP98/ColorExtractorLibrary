@@ -23,7 +23,6 @@
 		]
 	},
 	"mixins": [
-		"color-extractor-library.mixins.json",
 		{
 			"config": "color-extractor-library.client.mixins.json",
 			"environment": "client"
