@@ -17,7 +17,7 @@ import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 public class AssetPathResolver {
     public static Map<String, Map<String, List<String>>> assetPaths = new HashMap<>();
     public static boolean arePathsCached = false;
-    public static boolean arePathsLocked = false;
+    public static List<Short> pathsLocks = new ArrayList<>();
 
     public static boolean isUpdateQueued = false;
     public static boolean isClearQueued = false;
@@ -34,7 +34,7 @@ public class AssetPathResolver {
     public static boolean updatePathCache(boolean queueTheUpdate) {
         HashSet<String> cachedAssetTypes = new HashSet<>(Arrays.asList("blockstates", "models", "textures"));
 
-        if (!arePathsLocked) {
+        if (pathsLocks.isEmpty()) {
             clearPathCache();
 
             // Get the mods directory path
@@ -78,7 +78,7 @@ public class AssetPathResolver {
             return true;
         } else {
             // LOG the error
-            LOGGER.error("Asset path cache not updated!");
+            LOGGER.error("Asset path cache not updated! Path locks are in place!");
             isClearQueued &= !queueTheUpdate;
             isUpdateQueued = queueTheUpdate;
             return false;
@@ -125,13 +125,12 @@ public class AssetPathResolver {
         return clearPathCache(false);
     }
     public static boolean clearPathCache(boolean queueTheClear) {
-        if (!arePathsLocked) {
+        if (pathsLocks.isEmpty()) {
             arePathsCached = false;
             assetPaths.clear();
             return true;
         } else {
-            // LOG the error
-            LOGGER.error("Clear path cache not locked!");
+            LOGGER.warn("Paths are locked! Clear was not performed!");
             isUpdateQueued &= !queueTheClear;
             isClearQueued = queueTheClear;
             return false;
