@@ -1,6 +1,7 @@
 package io.github.mikip98.cel;
 
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
+import io.github.mikip98.cel.extractors.LightBlocksExtractor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import org.slf4j.Logger;
@@ -24,9 +25,17 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 		LOGGER.info("{} is initializing!", MOD_NAME);
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-				dispatcher.register(literal("ColorExtractorLibrary")
-						.then(literal("test").executes(context -> {
+				dispatcher.register(literal("color_extractor_library")
+						.then(literal("update_cache").executes(context -> {
 							AssetPathResolver.updatePathCache();
+							return 0;
+						}))
+						.then(literal("clear_cache").executes(context -> {
+							AssetPathResolver.clearPathCache();
+							return 0;
+						}))
+						.then(literal("log_light_blocks").executes(context -> {
+							LightBlocksExtractor.getLightEmittingBlockstates();
 							return 0;
 						}))
 				)

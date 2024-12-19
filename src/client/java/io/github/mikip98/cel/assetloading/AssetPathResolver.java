@@ -17,7 +17,7 @@ import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 public class AssetPathResolver {
     public static Map<String, Map<String, List<String>>> assetPaths = new HashMap<>();
     public static boolean arePathsCached = false;
-    public static List<Short> pathsLocks = new ArrayList<>();
+    public static HashSet<Short> pathsLocks = new HashSet<>();
 
     public static boolean isUpdateQueued = false;
     public static boolean isClearQueued = false;
@@ -135,5 +135,12 @@ public class AssetPathResolver {
             isClearQueued = queueTheClear;
             return false;
         }
+    }
+
+    public static void addPathsLock(short code) {
+        pathsLocks.add(code);
+    }
+    public static void removePathsLock(short code) {
+        pathsLocks.remove(code);
     }
 }

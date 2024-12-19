@@ -30,6 +30,13 @@ public class ColorExtractorAPI {
     public static boolean lockPathCache(boolean isCommandProof, int time) { return lockPathCache(isCommandProof, time, (short) -1); }
 
     public static boolean lockPathCache(boolean isCommandProof, int time, short code) {
+        AssetPathResolver.addPathsLock(code);
+        return false;
+    }
+
+    public static boolean unlockPathCache() { return unlockPathCache((short) -1); }
+    public static boolean unlockPathCache(short code) {
+        AssetPathResolver.removePathsLock(code);
         return false;
     }
 
