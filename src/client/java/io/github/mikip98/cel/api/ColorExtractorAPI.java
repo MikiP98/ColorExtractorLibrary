@@ -5,6 +5,7 @@ import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import org.jetbrains.annotations.NotNull;
 
 // This is the only class that mods using this lib should use/the only one that guarantees stability
+@SuppressWarnings("unused")
 public class ColorExtractorAPI {
     // ------------------------------------------------------------------------
     // --------------------------------- SETUP --------------------------------
@@ -14,17 +15,22 @@ public class ColorExtractorAPI {
         AssetPathResolver.cachePathsIfNotCached();
     }
 
-    public static void updatePathCache() {
-        AssetPathResolver.updatePathCache();
-    }
+    public static boolean updatePathCache() { return AssetPathResolver.updatePathCache(); }
 
-    public static void clearPathCache() {
-        AssetPathResolver.clearPathCache();
-    }
+    public static boolean clearPathCache() { return AssetPathResolver.clearPathCache(); }
 
     // Prevents the clearing of the path cache
-    public static void lockPathCache(boolean isCommandProof, int time, int code) {
+    public static boolean lockPathCache() { return lockPathCache(false); }
 
+    public static boolean lockPathCache(short code) { return lockPathCache(false, code); }
+    public static boolean lockPathCache(int time) { return lockPathCache(false, time); }
+    public static boolean lockPathCache(boolean isCommandProof) { return lockPathCache(isCommandProof, 1800); }
+
+    public static boolean lockPathCache(boolean isCommandProof, short code) { return lockPathCache(isCommandProof, 1800, code); }
+    public static boolean lockPathCache(boolean isCommandProof, int time) { return lockPathCache(isCommandProof, time, (short) -1); }
+
+    public static boolean lockPathCache(boolean isCommandProof, int time, short code) {
+        return false;
     }
 
 
