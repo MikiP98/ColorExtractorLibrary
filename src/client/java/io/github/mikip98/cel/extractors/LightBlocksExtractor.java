@@ -7,8 +7,6 @@ import net.minecraft.state.property.*;
 
 import java.util.*;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
-
 public class LightBlocksExtractor {
     @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
     public static Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> getLightEmittingBlocksData() {
