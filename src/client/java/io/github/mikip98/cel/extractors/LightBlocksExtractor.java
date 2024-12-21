@@ -10,10 +10,10 @@ import java.util.*;
 import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 
 public class LightBlocksExtractor {
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static Map<String, Map<String, Map<Byte, Set<Map<Property, Comparable>>>>> getLightEmittingBlockstates() {
+    @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
+    public static Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> getLightEmittingBlocksData() {
         // modId -> blockIds -> light levels -> property value pairs
-        Map<String, Map<String, Map<Byte, Set<Map<Property, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
+        Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
 
         for (Block block : Registries.BLOCK) {
             Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties = new HashMap<>();
@@ -52,30 +52,27 @@ public class LightBlocksExtractor {
                 // Compress the propertySets
                 lightEmittingProperties = compressLightEmittingProperties(lightEmittingProperties);
 
+                // Replace Property with its name
+                Map<Byte, Set<Map<String, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
+                for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
+                    lightEmittingPropertiesNamed.put(entry.getKey(), new HashSet<>());
+                    for (Map<Property, Comparable> propertyValuePairs : entry.getValue()) {
+                        Map<String, Comparable> propertyValuePairsNamed = new HashMap<>();
+                        for (Map.Entry<Property, Comparable> entry2 : propertyValuePairs.entrySet()) {
+                            Property property = entry2.getKey();
+                            Comparable value = entry2.getValue();
+                            propertyValuePairsNamed.put(property.getName(), value);
+                        }
+                        lightEmittingPropertiesNamed.get(entry.getKey()).add(propertyValuePairsNamed);
+                    }
+                }
+
                 String[] parts = block.getTranslationKey().split("\\.");
                 String modId = parts[1];
                 String blockstateId = parts[2];
 
                 lightEmittingBlocks.putIfAbsent(modId, new HashMap<>());
-                lightEmittingBlocks.get(modId).put(blockstateId, lightEmittingProperties);
-            }
-        }
-
-        LOGGER.info("Light emitting blocks:");
-        LOGGER.info("Mod count: {}", lightEmittingBlocks.size());
-        for (Map.Entry<String, Map<String, Map<Byte, Set<Map<Property, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
-            LOGGER.info("Mod: {}; With {} light emitting blocks:", entry.getKey(), entry.getValue().size());
-            for (Map.Entry<String, Map<Byte, Set<Map<Property, Comparable>>>> entry2 : entry.getValue().entrySet()) {
-                LOGGER.info("  - Blockstate: {}; With {} light levels:", entry2.getKey(), entry2.getValue().size());
-                for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry3 : entry2.getValue().entrySet()) {
-                    LOGGER.info("    - Light level: {}; With {} property sets:", entry3.getKey(), entry3.getValue().size());
-                    for (Map<Property, Comparable> propertySet : entry3.getValue()) {
-                        LOGGER.info("      - Property count: {}", propertySet.size());
-                        for (Map.Entry<Property, Comparable> propertyValuePair : propertySet.entrySet()) {
-                            LOGGER.info("        - {}={}", propertyValuePair.getKey().getName(), propertyValuePair.getValue());
-                        }
-                    }
-                }
+                lightEmittingBlocks.get(modId).put(blockstateId, lightEmittingPropertiesNamed);
             }
         }
 
