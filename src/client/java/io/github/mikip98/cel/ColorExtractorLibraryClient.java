@@ -1,6 +1,7 @@
 package io.github.mikip98.cel;
 
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
+import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
 import io.github.mikip98.cel.extractors.LightBlocksExtractor;
 import net.fabricmc.api.ClientModInitializer;
@@ -69,7 +70,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 										String modId = entry.getKey();
 										Map<String, Map<Byte, Set<Map<String, Comparable>>>> blockIds = entry.getValue();
 										for (Map.Entry<String, Map<Byte, Set<Map<String, Comparable>>>> blockEntry : blockIds.entrySet()) {
-											BlockstateColorExtractor.getBlockstateColor(modId, blockEntry.getKey());
+											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
 										}
 									}
 									return 0;
