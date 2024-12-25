@@ -6,11 +6,11 @@ import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
 import io.github.mikip98.cel.extractors.LightBlocksExtractor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
@@ -34,11 +34,19 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 				dispatcher.register(literal("color_extractor_library")
 						.then(literal("cache")
 								.then(literal("update_cache").executes(context -> {
-									AssetPathResolver.updatePathCache();
+									if (AssetPathResolver.updatePathCache()) {
+										context.getSource().sendFeedback(Text.of("Cache updated!"));
+									} else {
+										context.getSource().sendFeedback(Text.of("Cache updated failed!\nCache is locked"));
+									}
 									return 0;
 								}))
 								.then(literal("clear_cache").executes(context -> {
-									AssetPathResolver.clearPathCache();
+									if (AssetPathResolver.clearPathCache()) {
+										context.getSource().sendFeedback(Text.of("Cache cleared!"));
+									} else {
+										context.getSource().sendFeedback(Text.of("Cache clear failed!\nCache is command-proof locked by some mod"));
+									}
 									return 0;
 								}))
 						)
@@ -62,6 +70,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 											}
 										}
 									}
+									context.getSource().sendFeedback(Text.of("Done"));
 									return 0;
 								}))
 								.then(literal("log_blockstate_color_extrusion").executes(context -> {
@@ -70,9 +79,19 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 										String modId = entry.getKey();
 										Map<String, Map<Byte, Set<Map<String, Comparable>>>> blockIds = entry.getValue();
 										for (Map.Entry<String, Map<Byte, Set<Map<String, Comparable>>>> blockEntry : blockIds.entrySet()) {
-											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
+											List<Map<String, Comparable>> requiredPropertySets = new ArrayList<>();
+											for (Map.Entry<Byte, Set<Map<String, Comparable>>> lightLevelEntry : blockEntry.getValue().entrySet()) {
+												Map<String, Comparable> requiredPropertySet = new HashMap<>();
+												for (Map<String, Comparable> propertySet : lightLevelEntry.getValue()) {
+                                                    requiredPropertySet.putAll(propertySet);
+												}
+												requiredPropertySets.add(requiredPropertySet);
+											}
+											LOGGER.info("Mod: {}; Blockstate: {}; Required properties: {}", modId, blockEntry.getKey(), requiredPropertySets);
+											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
 										}
 									}
+									context.getSource().sendFeedback(Text.of("Done"));
 									return 0;
 								}))
 						)

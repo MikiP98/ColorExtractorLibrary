@@ -1,6 +1,7 @@
 package io.github.mikip98.cel.assetloading;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.StringNbtReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,8 @@ import java.util.zip.ZipFile;
 import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 
 public class AssetPathResolver {
-    public static Map<String, Map<String, List<String>>> assetPaths = new HashMap<>();
+    // Mod ID -> Asset Type -> List of assets
+    public static Map<String, Map<String, Map<String, List<String>>>> assetPaths = new HashMap<>();
     public static boolean arePathsCached = false;
     public static HashSet<Short> pathsLocks = new HashSet<>();
 
@@ -56,20 +58,21 @@ public class AssetPathResolver {
             }
 
             int size = 0;
-            LOGGER.info("Asset path cache updated!");
-            LOGGER.info("Found `{}` mods:", assetPaths.size());
-            for (Map.Entry<String, Map<String, List<String>>> entry : assetPaths.entrySet()) {
+//            LOGGER.info("Asset path cache updated!");
+//            LOGGER.info("Found `{}` mods:", assetPaths.size());
+            for (Map.Entry<String, Map<String, Map<String, List<String>>>> entry : assetPaths.entrySet()) {
                 size += entry.getKey().getBytes().length;
-                LOGGER.info("  - ModID: {}", entry.getKey());
-                for (Map.Entry<String, List<String>> assetEntry : entry.getValue().entrySet()) {
+//                LOGGER.info("  - ModID: {}", entry.getKey());
+                for (Map.Entry<String, Map<String, List<String>>> assetEntry : entry.getValue().entrySet()) {
                     size += assetEntry.getKey().getBytes().length;
-                    LOGGER.info("    - Asset entry: {}; Length: {}", assetEntry.getKey(), assetEntry.getValue().size());
-                    for (String asset : assetEntry.getValue()) {
-                        size += asset.getBytes().length;
+//                    LOGGER.info("    - Asset entry: {}; Length: {}", assetEntry.getKey(), assetEntry.getValue().size());
+                    for (Map.Entry<String, List<String>> asset : assetEntry.getValue().entrySet()) {
+                        size += asset.getKey().getBytes().length;
+//                        LOGGER.info("      - Asset: {}", asset);
                     }
                 }
             }
-            LOGGER.info("Bytes: {}; Kilobytes: {}; Megabytes: {}", size,
+            LOGGER.info("Path cache updated! Bytes: {}; Kilobytes: {}; Megabytes: {}", size,
                     ((float) Math.round(((float) size) / 1024 * 10)) / 10,
                     ((float) Math.round(((float) size) / 1024 / 1024 * 10)) / 10
             );
@@ -88,7 +91,7 @@ public class AssetPathResolver {
         try (ZipFile zipFile = new ZipFile(file)) {
 
             String lastModID = null;
-            Map<String, List<String>> entryTypes = new HashMap<>();
+            Map<String, Map<String, List<String>>> entryTypes = new HashMap<>();
 
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
@@ -108,8 +111,11 @@ public class AssetPathResolver {
 
                     String entryType = parts[2];
                     if (cachedAssetTypes.contains(entryType)) {
-                        String rest = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
-                        entryTypes.computeIfAbsent(entryType, k -> new ArrayList<>()).add(rest);
+                        String assetId = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+                        String[] parts2 = assetId.split("\\.");
+                        assetId = String.join(".", Arrays.copyOfRange(parts2, 0, parts2.length - 1));
+                        entryTypes.computeIfAbsent(entryType, k -> new HashMap<>()).put(assetId, new ArrayList<>());
+                        entryTypes.get(entryType).get(assetId).add(file.getName());
                     }
                 }
             }
@@ -142,5 +148,53 @@ public class AssetPathResolver {
     }
     public static void removePathsLock(short code) {
         pathsLocks.remove(code);
+    }
+
+
+    public static AssetPaths getBlockstatePaths(String modID, String blockstateID) {
+//        LOGGER.info("Getting blockstate `{}` from mod `{}`", blockstateID, modID);
+
+        if (!assetPaths.containsKey(modID)) {
+            LOGGER.warn("Mod `{}` does not exist!", modID);
+            return null;
+        }
+
+        Map<String, Map<String, List<String>>> modAssets = assetPaths.get(modID);
+        if (!modAssets.containsKey("blockstates")) {
+            LOGGER.warn("Mod `{}` does not have blockstates!", modID);
+            return null;
+        }
+
+        Map<String, List<String>> blockstates = modAssets.get("blockstates");
+        if (!blockstates.containsKey(blockstateID)) {
+            LOGGER.warn("Blockstate `{}` does not exist!", blockstateID);
+            LOGGER.warn("Available blockstates: {}", blockstates);
+            return null;
+        }
+
+        List<String> files = blockstates.get(blockstateID);
+        LOGGER.info("Found blockstate `{}` in {} files: {}", blockstateID, files.size(), files);
+
+        return generatePaths(files, modID, "blockstates", blockstateID, "json");
+    }
+
+    public static AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID, String assetExtension) {
+        AssetPaths paths = new AssetPaths();
+
+        paths.jarPaths = new ArrayList<>();
+        paths.assetPath = "assets/" + modID + "/" + assetType + "/" + assetID + "." + assetExtension;
+
+        Path modDir = FabricLoader.getInstance().getGameDir().resolve("mods");
+
+        for (String file : modFiles) {
+            paths.jarPaths.add(modDir.resolve(file).toString());
+        }
+
+        return paths;
+    }
+
+    public static class AssetPaths {
+        public String assetPath;
+        public List<String> jarPaths;
     }
 }
