@@ -3,7 +3,6 @@ package io.github.mikip98.cel.extractors;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.github.mikip98.cel.enums.AVGTypes;
-import io.github.mikip98.cel.structures.ColorRGBA;
 import io.github.mikip98.cel.structures.ColorReturn;
 import org.jetbrains.annotations.NotNull;
 

@@ -186,7 +186,6 @@ public class BlockstateColorExtractor {
 
                             } else {
 //                                LOGGER.info("Key '{}' does not contain required properties: {}", key, requiredPropertySets);
-                                LOGGER.
                             }
                         }
 
