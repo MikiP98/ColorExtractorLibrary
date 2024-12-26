@@ -7,7 +7,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import io.github.mikip98.cel.enums.AVGTypes;
-import io.github.mikip98.cel.structures.ColorRGBA;
 import io.github.mikip98.cel.structures.ColorReturn;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,10 +21,10 @@ import java.util.zip.ZipFile;
 
 import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 
-public class BlockstateColorExtractor {
+public class BlockstateColorExtractor extends BaseColorExtractor {
 
     private static final Cache<String, ColorReturn> colorCache = CacheBuilder.newBuilder()
-            .maximumSize(32)
+            .maximumSize(256)
             .expireAfterAccess(Constants.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
             .build();
 
@@ -35,22 +34,19 @@ public class BlockstateColorExtractor {
 
 
     @SuppressWarnings("rawtypes")
-    public static @NotNull ColorReturn getAverageBlockstateColor(String modId, String blockstateId, List<Map<String, Comparable>> requiredPropertySets, float weightedness, AVGTypes avgType) {
+    public static ColorReturn getAverageBlockstateColor(String modId, String blockstateId, List<Map<String, Comparable>> requiredPropertySets, float weightedness, AVGTypes avgType) {
         String cacheKey = modId + "_" + blockstateId;
 
         // Check the cache first
         ColorReturn colorReturn = colorCache.getIfPresent(cacheKey);
 
         if (colorReturn == null) {
-            // Get blockstate path
+            // Get blockstate paths
             AssetPathResolver.AssetPaths blockstatePaths = AssetPathResolver.getBlockstatePaths(modId, blockstateId);
 
-            if (blockstatePaths == null || blockstatePaths.jarPaths.isEmpty() || blockstatePaths.assetPath == null || blockstatePaths.assetPath.isEmpty()) {
-                return new ColorReturn(
-                        new ColorRGBA(128, 128, 128, 128),
-                        new ColorRGBA(128, 128, 128, 128),
-                        1
-                );
+            if (blockstatePaths == null || blockstatePaths.jarPaths == null || blockstatePaths.jarPaths.isEmpty() || blockstatePaths.assetPath == null || blockstatePaths.assetPath.isEmpty()) {
+                LOGGER.warn("Failed to get blockstate paths for blockstate `{}` from mod `{}`", blockstateId, modId);
+                return null;
             }
             colorReturn = new ColorReturn();
 
@@ -74,7 +70,7 @@ public class BlockstateColorExtractor {
                             modelPathId = modelPathSplit[1];
                         }
 
-                        ColorReturn modelColor = BlockModelColorExtractor.getAverageModelColor(modelModId, modelPathId, avgType);
+                        ColorReturn modelColor = BlockModelColorExtractor.getAverageModelColor(modelModId, modelPathId, weightedness, avgType);
                         if (modelColor != null) {
                             colorReturn.add(modelColor);
                         }
@@ -93,30 +89,10 @@ public class BlockstateColorExtractor {
         return colorReturn;
     }
 
-    public static ColorRGBA postProcessData(ColorReturn colorReturn, float weightedness) {
-        ColorRGBA color_weighted_avg = colorReturn.color_avg;
-
-        ColorRGBA color_sum = colorReturn.color_sum;
-        double weight_sum = colorReturn.weight_sum;
-        ColorRGBA color_avg = new ColorRGBA(
-                color_sum.r / weight_sum,
-                color_sum.g / weight_sum,
-                color_sum.b / weight_sum,
-                color_sum.a / weight_sum
-        );
-
-        return new ColorRGBA(
-                color_weighted_avg.r * weightedness + color_avg.r * (1 - weightedness),
-                color_weighted_avg.g * weightedness + color_avg.g * (1 - weightedness),
-                color_weighted_avg.b * weightedness + color_avg.b * (1 - weightedness),
-                color_weighted_avg.a * weightedness + color_avg.a * (1 - weightedness)
-        );
-    }
-
     @SuppressWarnings("rawtypes")
     public static @NotNull List<String> extractModelPathsFromBlockstate(String jarPath, String blockstatePath, List<Map<String, Comparable>> requiredPropertySets) {
-        LOGGER.info("Extracting model paths from blockstate: {}", blockstatePath);
-        LOGGER.info("In jar: {}", jarPath);
+//        LOGGER.info("Extracting model paths from blockstate: {}", blockstatePath);
+//        LOGGER.info("In jar: {}", jarPath);
         List<String> modelPaths = new ArrayList<>();
 
         // Create a Gson instance
@@ -221,14 +197,14 @@ public class BlockstateColorExtractor {
                     }
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error reading blockstate file: {};\nException: {};\nStacktrace: {}", blockstatePath, e.getMessage(), e.getStackTrace());
                 }
             } else {
                 LOGGER.error("JSON file not found in the JAR/ZIP archive.");
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error opening JAR/ZIP file: {};\nException: {};\nStacktrace: {}", jarPath, e.getMessage(), e.getStackTrace());
         }
 
         LOGGER.info("Extracted {} model paths from blockstate file: {}", modelPaths.size(), blockstatePath);

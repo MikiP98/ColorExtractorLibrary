@@ -1,7 +1,6 @@
 package io.github.mikip98.cel.assetloading;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.StringNbtReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,21 +56,7 @@ public class AssetPathResolver {
                 return false;
             }
 
-            int size = 0;
-//            LOGGER.info("Asset path cache updated!");
-//            LOGGER.info("Found `{}` mods:", assetPaths.size());
-            for (Map.Entry<String, Map<String, Map<String, List<String>>>> entry : assetPaths.entrySet()) {
-                size += entry.getKey().getBytes().length;
-//                LOGGER.info("  - ModID: {}", entry.getKey());
-                for (Map.Entry<String, Map<String, List<String>>> assetEntry : entry.getValue().entrySet()) {
-                    size += assetEntry.getKey().getBytes().length;
-//                    LOGGER.info("    - Asset entry: {}; Length: {}", assetEntry.getKey(), assetEntry.getValue().size());
-                    for (Map.Entry<String, List<String>> asset : assetEntry.getValue().entrySet()) {
-                        size += asset.getKey().getBytes().length;
-//                        LOGGER.info("      - Asset: {}", asset);
-                    }
-                }
-            }
+            final int size = getCacheSize();
             LOGGER.info("Path cache updated! Bytes: {}; Kilobytes: {}; Megabytes: {}", size,
                     ((float) Math.round(((float) size) / 1024 * 10)) / 10,
                     ((float) Math.round(((float) size) / 1024 / 1024 * 10)) / 10
@@ -87,6 +72,26 @@ public class AssetPathResolver {
             return false;
         }
     }
+
+    private static int getCacheSize() {
+        int size = 0;
+//        LOGGER.info("Asset path cache updated!");
+//        LOGGER.info("Found `{}` mods:", assetPaths.size());
+        for (Map.Entry<String, Map<String, Map<String, List<String>>>> entry : assetPaths.entrySet()) {
+            size += entry.getKey().getBytes().length;
+//            LOGGER.info("  - ModID: {}", entry.getKey());
+            for (Map.Entry<String, Map<String, List<String>>> assetEntry : entry.getValue().entrySet()) {
+                size += assetEntry.getKey().getBytes().length;
+//                LOGGER.info("    - Asset entry: {}; Length: {}", assetEntry.getKey(), assetEntry.getValue().size());
+                for (Map.Entry<String, List<String>> asset : assetEntry.getValue().entrySet()) {
+                    size += asset.getKey().getBytes().length;
+//                    LOGGER.info("      - Asset: {}", asset);
+                }
+            }
+        }
+        return size;
+    }
+
     public static void handleZipOrJar(File file, HashSet<String> cachedAssetTypes) {
         try (ZipFile zipFile = new ZipFile(file)) {
 
@@ -161,7 +166,7 @@ public class AssetPathResolver {
 
         Map<String, Map<String, List<String>>> modAssets = assetPaths.get(modID);
         if (!modAssets.containsKey("blockstates")) {
-            LOGGER.warn("Mod `{}` does not have blockstates!", modID);
+            LOGGER.warn("Mod `{}` does not have any blockstates!", modID);
             return null;
         }
 
@@ -176,6 +181,56 @@ public class AssetPathResolver {
         LOGGER.info("Found blockstate `{}` in {} files: {}", blockstateID, files.size(), files);
 
         return generatePaths(files, modID, "blockstates", blockstateID, "json");
+    }
+
+    public static AssetPaths getModelPaths(String modId, String modelId) {
+        if (!assetPaths.containsKey(modId)) {
+            LOGGER.warn("Mod `{}` does not exist!", modId);
+            return null;
+        }
+
+        Map<String, Map<String, List<String>>> modAssets = assetPaths.get(modId);
+        if (!modAssets.containsKey("blockstates")) {
+            LOGGER.warn("Mod `{}` does not have any models!", modId);
+            return null;
+        }
+
+        Map<String, List<String>> models = modAssets.get("models");
+        if (!models.containsKey(modelId)) {
+            LOGGER.warn("Model `{}` does not exist!", modelId);
+            LOGGER.warn("Available models: {}", models);
+            return null;
+        }
+
+        List<String> files = models.get(modelId);
+        LOGGER.info("Found model `{}` in {} files: {}", modelId, files.size(), files);
+
+        return generatePaths(files, modId, "models", modelId, "json");
+    }
+
+    public static AssetPaths getTexturePaths(String modId, String textureId) {
+        if (!assetPaths.containsKey(modId)) {
+            LOGGER.warn("Mod `{}` does not exist!", modId);
+            return null;
+        }
+
+        Map<String, Map<String, List<String>>> modAssets = assetPaths.get(modId);
+        if (!modAssets.containsKey("textures")) {
+            LOGGER.warn("Mod `{}` does not have any textures!", modId);
+            return null;
+        }
+
+        Map<String, List<String>> textures = modAssets.get("textures");
+        if (!textures.containsKey(textureId)) {
+            LOGGER.warn("Texture `{}` does not exist!", textureId);
+            LOGGER.warn("Available textures: {}", textures);
+            return null;
+        }
+
+        List<String> files = textures.get(textureId);
+        LOGGER.info("Found texture `{}` in {} files: {}", textureId, files.size(), files);
+
+        return generatePaths(files, modId, "textures", textureId, "png");
     }
 
     public static AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID, String assetExtension) {

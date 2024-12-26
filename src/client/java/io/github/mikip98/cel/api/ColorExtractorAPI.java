@@ -2,7 +2,11 @@ package io.github.mikip98.cel.api;
 
 import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
+import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
+import io.github.mikip98.cel.structures.ColorReturn;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 // This is the only class that mods using this lib should use/the only one that guarantees stability
 @SuppressWarnings("unused")
@@ -53,7 +57,7 @@ public class ColorExtractorAPI {
      * @param blockstateID the ID of the blockstate
      * @return the average color as an array of RGB values
      */
-    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID) {
+    public static ColorReturn getAverageColorForBlockstate(String modID, String blockstateID) {
         return getAverageColorForBlockstate(modID, blockstateID, 1.0f, AVGTypes.WEIGHTED_ARITHMETIC);
     }
     /**
@@ -64,7 +68,7 @@ public class ColorExtractorAPI {
      * @param avgType the type of average to use for the color extraction
      * @return the average color as an array of RGB values
      */
-    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, AVGTypes avgType) {
+    public static ColorReturn getAverageColorForBlockstate(String modID, String blockstateID, AVGTypes avgType) {
         return getAverageColorForBlockstate(modID, blockstateID, 1.0f, avgType);
     }
     /**
@@ -75,7 +79,7 @@ public class ColorExtractorAPI {
      * @param weightedness the weightedness of the color extraction; should be between 0 and 1
      * @return the average color as an array of RGB values
      */
-    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, float weightedness) {
+    public static ColorReturn getAverageColorForBlockstate(String modID, String blockstateID, float weightedness) {
         return getAverageColorForBlockstate(modID, blockstateID, weightedness, AVGTypes.WEIGHTED_ARITHMETIC);
     }
     /**
@@ -87,9 +91,9 @@ public class ColorExtractorAPI {
      * @param avgType the type of average to use for the color extraction
      * @return the average color as an array of RGB values
      */
-    public static int @NotNull [] getAverageColorForBlockstate(String modID, String blockstateID, float weightedness, AVGTypes avgType) {
+    public static ColorReturn getAverageColorForBlockstate(String modID, String blockstateID, float weightedness, AVGTypes avgType) {
         weightedness = validateWeightedness(weightedness);
-        return new int[0];
+        return BlockstateColorExtractor.getAverageBlockstateColor(modID, blockstateID, new ArrayList<>(), weightedness, avgType);
     }
 
 

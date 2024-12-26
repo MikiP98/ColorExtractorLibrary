@@ -4,8 +4,10 @@ import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
 import io.github.mikip98.cel.extractors.LightBlocksExtractor;
+import io.github.mikip98.cel.extractors.TranslucentBlocksExtractor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.block.Block;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,16 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 											}
 										}
 									}
+									context.getSource().sendFeedback(Text.of("Done"));
+									return 0;
+								}))
+								.then(literal("log_translucent_blocks").executes(context -> {
+									List<Block> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
+
+									for (Block block : translucentBlocks) {
+										LOGGER.info("Translucent block: {}", block.asItem().getTranslationKey());
+									}
+
 									context.getSource().sendFeedback(Text.of("Done"));
 									return 0;
 								}))
