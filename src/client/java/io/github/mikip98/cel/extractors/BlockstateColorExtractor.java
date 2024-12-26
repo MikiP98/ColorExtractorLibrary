@@ -29,6 +29,10 @@ public class BlockstateColorExtractor {
             .expireAfterAccess(Constants.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
             .build();
 
+    public static void clearCache() {
+        colorCache.invalidateAll();
+    }
+
 
     @SuppressWarnings("rawtypes")
     public static @NotNull ColorReturn getAverageBlockstateColor(String modId, String blockstateId, List<Map<String, Comparable>> requiredPropertySets, float weightedness, AVGTypes avgType) {
@@ -38,8 +42,6 @@ public class BlockstateColorExtractor {
         ColorReturn colorReturn = colorCache.getIfPresent(cacheKey);
 
         if (colorReturn == null) {
-            colorReturn = new ColorReturn();
-
             // Get blockstate path
             AssetPathResolver.AssetPaths blockstatePaths = AssetPathResolver.getBlockstatePaths(modId, blockstateId);
 
@@ -50,9 +52,11 @@ public class BlockstateColorExtractor {
                         1
                 );
             }
+            colorReturn = new ColorReturn();
 
             LOGGER.info("Blockstate path: {} in mod files: {}", blockstatePaths.assetPath, blockstatePaths.jarPaths);
 
+            int totalModelPathCount = 0;
             String assetPath = blockstatePaths.assetPath;
             for (String jarPath : blockstatePaths.jarPaths) {
                 List<String> modelPaths = extractModelPathsFromBlockstate(jarPath, assetPath, requiredPropertySets);
@@ -71,12 +75,16 @@ public class BlockstateColorExtractor {
                         }
 
                         ColorReturn modelColor = BlockModelColorExtractor.getAverageModelColor(modelModId, modelPathId, avgType);
-                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", modelPathId, modelModId, colorReturn.toString());
+                        if (modelColor != null) {
+                            colorReturn.add(modelColor);
+                        }
+                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", modelPathId, modelModId, colorReturn);
                     }
+                    totalModelPathCount += modelPaths.size();
                 }
             }
-
-//            colorReturn.color_avg = postProcessData(colorReturn, weightedness);
+            colorReturn.color_avg.divide(totalModelPathCount);
+            colorReturn.color_avg = postProcessData(colorReturn, weightedness);
 
             // Store the result in the cache
             colorCache.put(cacheKey, colorReturn);
@@ -105,10 +113,6 @@ public class BlockstateColorExtractor {
         );
     }
 
-    public static void clearCache() {
-        colorCache.invalidateAll();
-    }
-
     @SuppressWarnings("rawtypes")
     public static @NotNull List<String> extractModelPathsFromBlockstate(String jarPath, String blockstatePath, List<Map<String, Comparable>> requiredPropertySets) {
         LOGGER.info("Extracting model paths from blockstate: {}", blockstatePath);
@@ -128,10 +132,10 @@ public class BlockstateColorExtractor {
                 try (InputStream inputStream = zipFile.getInputStream(entry); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
                     JsonObject blockstateJson = gson.fromJson(reader, JsonObject.class);  // Or use your specific class
-                    LOGGER.info("Blockstate JSON: {}", blockstateJson);
+//                    LOGGER.info("Blockstate JSON: {}", blockstateJson);
 
                     Set<String> keys = blockstateJson.keySet();
-                    LOGGER.info("Blockstate JSON keys: {}", keys);
+//                    LOGGER.info("Blockstate JSON keys: {}", keys);
 
                     if (keys.contains("variants")) {
                         LOGGER.info("Blockstate type: 'variants'");
@@ -140,7 +144,7 @@ public class BlockstateColorExtractor {
                         JsonObject variants = blockstateJson.getAsJsonObject("variants");
 
                         Set<String> variantKeys = variants.keySet();
-                        LOGGER.info("Keys: {}", variantKeys);
+//                        LOGGER.info("Keys: {}", variantKeys);
 
                         for (String key : variantKeys) {
                             List<String> keyParts = List.of(key.split(","));

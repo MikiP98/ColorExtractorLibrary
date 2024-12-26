@@ -4,7 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.structures.ColorReturn;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +14,16 @@ public class BlockModelColorExtractor {
             .expireAfterAccess(Constants.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
             .build();
 
-    public static @NotNull ColorReturn getAverageModelColor(String modId, String modelId, AVGTypes avgType) {
-        return null;
+    public static ColorReturn getAverageModelColor(String modId, String modelId, AVGTypes avgType) {
+        String cacheKey = modId + "_" + modelId;
+
+        // Check the cache first
+        ColorReturn colorReturn = colorCache.getIfPresent(cacheKey);
+
+        if (colorReturn == null) {
+            colorReturn = new ColorReturn();
+        }
+
+        return colorReturn;
     }
 }

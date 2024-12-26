@@ -14,5 +14,32 @@ public class ColorRGBA {
     }
 
     public ColorRGBA() {
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+        this.a = 0;
+    }
+
+    public void add(ColorRGBA other) {
+        this.r += other.r;
+        this.g += other.g;
+        this.b += other.b;
+        this.a += other.a;
+    }
+    public void divide(int n) {
+        this.r /= n;
+        this.g /= n;
+        this.b /= n;
+        this.a /= n;
+    }
+
+    @Override
+    public String toString() {
+        return "ColorRGBA{" +
+                "r=" + r +
+                ", g=" + g +
+                ", b=" + b +
+                ", a=" + a +
+                '}';
     }
 }
