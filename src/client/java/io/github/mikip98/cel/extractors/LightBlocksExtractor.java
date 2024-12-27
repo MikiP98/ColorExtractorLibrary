@@ -65,7 +65,7 @@ public class LightBlocksExtractor {
                     }
                 }
 
-                String[] parts = block.getTranslationKey().split("\\.");
+                String[] parts = block.getTranslationKey().split("\\.", 3);
                 String modId = parts[1];
                 String blockstateId = parts[2];
 

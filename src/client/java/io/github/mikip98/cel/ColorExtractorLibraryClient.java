@@ -5,6 +5,7 @@ import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
 import io.github.mikip98.cel.extractors.LightBlocksExtractor;
 import io.github.mikip98.cel.extractors.TranslucentBlocksExtractor;
+import io.github.mikip98.cel.structures.ColorReturn;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.block.Block;
@@ -75,17 +76,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 									context.getSource().sendFeedback(Text.of("Done"));
 									return 0;
 								}))
-								.then(literal("log_translucent_blocks").executes(context -> {
-									List<Block> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
-
-									for (Block block : translucentBlocks) {
-										LOGGER.info("Translucent block: {}", block.asItem().getTranslationKey());
-									}
-
-									context.getSource().sendFeedback(Text.of("Done"));
-									return 0;
-								}))
-								.then(literal("log_blockstate_color_extrusion").executes(context -> {
+								.then(literal("log_avg_colors_for_light_emitting_blocks").executes(context -> {
 									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = LightBlocksExtractor.getLightEmittingBlocksData();
 									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										String modId = entry.getKey();
@@ -95,7 +86,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 											for (Map.Entry<Byte, Set<Map<String, Comparable>>> lightLevelEntry : blockEntry.getValue().entrySet()) {
 												Map<String, Comparable> requiredPropertySet = new HashMap<>();
 												for (Map<String, Comparable> propertySet : lightLevelEntry.getValue()) {
-                                                    requiredPropertySet.putAll(propertySet);
+													requiredPropertySet.putAll(propertySet);
 												}
 												requiredPropertySets.add(requiredPropertySet);
 											}
@@ -103,6 +94,37 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
 										}
 									}
+									context.getSource().sendFeedback(Text.of("Done"));
+									return 0;
+								}))
+								.then(literal("log_translucent_blocks").executes(context -> {
+									Map<String, List<String>> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
+
+									LOGGER.info("Translucent blocks:");
+									for (Map.Entry<String, List<String>> entry : translucentBlocks.entrySet()) {
+										LOGGER.info("- mod: {}", entry.getKey());
+										for (String blockstate : entry.getValue()) {
+											LOGGER.info("  - blockstate: {}", blockstate);
+										}
+									}
+
+									context.getSource().sendFeedback(Text.of("Done"));
+									return 0;
+								}))
+								.then(literal("log_avg_colors_for_translucent_blocks").executes(context -> {
+									Map<String, List<String>> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
+
+									LOGGER.info("Translucent blocks:");
+									for (Map.Entry<String, List<String>> entry : translucentBlocks.entrySet()) {
+										LOGGER.info("- mod: {}", entry.getKey());
+										for (String blockstate : entry.getValue()) {
+											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(entry.getKey(), blockstate, null, 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
+											if (colorReturn != null) {
+												LOGGER.info("  - blockstate: {}; color: {}", blockstate, colorReturn.color_avg);
+											}
+										}
+									}
+
 									context.getSource().sendFeedback(Text.of("Done"));
 									return 0;
 								}))

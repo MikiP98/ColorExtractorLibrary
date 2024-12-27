@@ -91,6 +91,10 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 
     @SuppressWarnings("rawtypes")
     public static @NotNull List<String> extractModelPathsFromBlockstate(String jarPath, String blockstatePath, List<Map<String, Comparable>> requiredPropertySets) {
+        if (requiredPropertySets == null) {
+            requiredPropertySets = new ArrayList<>();
+        }
+
 //        LOGGER.info("Extracting model paths from blockstate: {}", blockstatePath);
 //        LOGGER.info("In jar: {}", jarPath);
         List<String> modelPaths = new ArrayList<>();
@@ -123,15 +127,24 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 //                        LOGGER.info("Keys: {}", variantKeys);
 
                         for (String key : variantKeys) {
-                            List<String> keyParts = List.of(key.split(","));
                             Map<String, String> keyPartsKeyValuePairs = new HashMap<>();
-                            for (String keyPart : keyParts) {
-                                String[] keyPartKeyValue = keyPart.split("=");
-                                keyPartsKeyValuePairs.put(keyPartKeyValue[0], keyPartKeyValue[1]);
+
+                            // Check if the key is not empty, a.k.a if it is not universal
+                            if (key.contains("=")) {
+                                List<String> keyParts = List.of(key.split(","));
+                                for (String keyPart : keyParts) {
+                                    String[] keyPartKeyValue = keyPart.split("=");
+                                    try {
+                                        keyPartsKeyValuePairs.put(keyPartKeyValue[0], keyPartKeyValue[1]);
+                                    } catch (ArrayIndexOutOfBoundsException e) {
+                                        LOGGER.error("Failed to parse key part: {}; From key: {}; From variantKeys: {}; From variants: {}", keyPart, key, variantKeys, variants);
+                                    }
+                                }
                             }
 
                             // Check if keyParts contains at least 1 full set of required properties
-                            boolean containsRequiredProperties = false;
+                            // or true if requiredPropertySets is empty
+                            boolean containsRequiredProperties = requiredPropertySets.isEmpty();
                             for (Map<String, Comparable> requiredPropertySet : requiredPropertySets) {
                                 boolean containsAllRequiredProperties = true;
                                 for (Map.Entry<String, Comparable> keyPart : requiredPropertySet.entrySet()) {
