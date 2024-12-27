@@ -103,7 +103,7 @@ public class AssetPathResolver {
                 ZipEntry entry = entries.nextElement();
 
                 if (entry.getName().startsWith("assets/") && !entry.isDirectory()) {
-                    String[] parts = entry.getName().split("/");
+                    String[] parts = entry.getName().split("/", 4);
                     String currentModID = parts[1];
 
                     if (!Objects.equals(lastModID, currentModID)) {
@@ -114,11 +114,21 @@ public class AssetPathResolver {
                         entryTypes.clear();
                     }
 
+                    if (parts.length < 3) {
+                        LOGGER.warn("Invalid or not supported entry: {}", entry.getName());
+                        continue;
+                    }
+                    LOGGER.info("Parts: {}", Arrays.toString(parts));
+                    // TODO: fix, default vanilla textures are not loading correctly, only gui/... textures are being cached
+
                     String entryType = parts[2];
                     if (cachedAssetTypes.contains(entryType)) {
-                        String assetId = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+                        String assetId = parts[3];
+
                         String[] parts2 = assetId.split("\\.");
                         assetId = String.join(".", Arrays.copyOfRange(parts2, 0, parts2.length - 1));
+                        LOGGER.info("Caching asset: {}", assetId);
+
                         entryTypes.computeIfAbsent(entryType, k -> new HashMap<>()).put(assetId, new ArrayList<>());
                         entryTypes.get(entryType).get(assetId).add(file.getName());
                     }

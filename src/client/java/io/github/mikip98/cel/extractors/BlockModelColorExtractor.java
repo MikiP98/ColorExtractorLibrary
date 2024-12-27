@@ -78,7 +78,7 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                 }
             }
             if (totalTexturePathCount == 0) {
-                LOGGER.error("Failed to get texture paths for model `{}` from mod `{}`", modelId, modId);
+                LOGGER.error("Failed to get texture paths for model `{}` from mod `{}`; Or failed to process all its textures", modelId, modId);
                 return null;
             }
 //            LOGGER.info("Total texture path count: {}", totalTexturePathCount);

@@ -46,7 +46,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
             AssetPathResolver.AssetPaths blockstatePaths = AssetPathResolver.getBlockstatePaths(modId, blockstateId);
 
             if (blockstatePaths == null || blockstatePaths.jarPaths == null || blockstatePaths.jarPaths.isEmpty() || blockstatePaths.assetPath == null || blockstatePaths.assetPath.isEmpty()) {
-                LOGGER.warn("Failed to get blockstate paths for blockstate `{}` from mod `{}`", blockstateId, modId);
+                LOGGER.error("Failed to get blockstate paths for blockstate `{}` from mod `{}`", blockstateId, modId);
                 return null;
             }
             colorReturn = new ColorReturn();
@@ -81,7 +81,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                 }
             }
             if (totalModelPathCount == 0) {
-                LOGGER.error("Failed to get model paths for blockstate `{}` from mod `{}`", blockstateId, modId);
+                LOGGER.error("Failed to get model paths for blockstate `{}` from mod `{}; Or failed to precess all its models`", blockstateId, modId);
                 return null;
             }
             colorReturn.color_avg.divide(totalModelPathCount);

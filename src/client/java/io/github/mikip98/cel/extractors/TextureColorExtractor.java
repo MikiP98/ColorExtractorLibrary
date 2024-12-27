@@ -120,7 +120,9 @@ public class TextureColorExtractor extends BaseColorExtractor {
             case ARITHMETIC:
                 for (int x = 0; x < image.getWidth(); x++) {
                     for (int y = 0; y < image.getHeight(); y++) {
-                        color_sum.add(pixel2Color(image.getRGB(x, y)));
+                        ColorRGBA pixelColor = pixel2Color(image.getRGB(x, y));
+                        if (pixelColor.a == 0) continue;
+                        color_sum.add(pixelColor);
                         weight += 1;
                     }
                 }
@@ -133,6 +135,7 @@ public class TextureColorExtractor extends BaseColorExtractor {
                 for (int x = 0; x < image.getWidth(); x++) {
                     for (int y = 0; y < image.getHeight(); y++) {
                         ColorRGBA pixelColor = pixel2Color(image.getRGB(x, y));
+                        if (pixelColor.a == 0) continue;
                         avg_color.multiply(pixelColor);
                         color_sum.add(pixelColor);
                         weight += 1;
@@ -145,14 +148,10 @@ public class TextureColorExtractor extends BaseColorExtractor {
                 for (int x = 0; x < image.getWidth(); x++) {
                     for (int y = 0; y < image.getHeight(); y++) {
                         ColorRGBA pixelColor = pixel2Color(image.getRGB(x, y));
+                        if (pixelColor.a == 0) continue;
 
                         ColorRGBA normalizedPixelColor = pixelColor.copy();
                         normalizedPixelColor.divide(255);
-
-                        if (normalizedPixelColor.r > 1 || normalizedPixelColor.g > 1 || normalizedPixelColor.b > 1 || normalizedPixelColor.a > 1) {
-                            LOGGER.error("Color values are out of range: {}; {}; {}; {}", normalizedPixelColor.r, normalizedPixelColor.g, normalizedPixelColor.b, normalizedPixelColor.a);
-                            throw new RuntimeException("Color values are out of range");
-                        }
 
                         float[] HSB = Color.RGBtoHSB(((int) pixelColor.r), ((int) pixelColor.g), ((int) pixelColor.b), null);
                         float saturation = HSB[1];
@@ -172,11 +171,6 @@ public class TextureColorExtractor extends BaseColorExtractor {
                                 normalizedPixelColor.a
                         );
 
-                        if (pixelColor.r > 255 || pixelColor.g > 255 || pixelColor.b > 255 || pixelColor.a > 255) {
-                            LOGGER.error("Color values are out of range: {}; {}; {}; {}", pixelColor.r, pixelColor.g, pixelColor.b, pixelColor.a);
-                            throw new RuntimeException("Color values are out of range");
-                        }
-
                         pixelColor.multiply(weight_factor);
                         color_sum.add(pixelColor);
                         weight += weight_factor;
@@ -189,11 +183,6 @@ public class TextureColorExtractor extends BaseColorExtractor {
             default:
                 LOGGER.error("Invalid AVG type: {}", avgType);
                 return null;
-        }
-
-        if (Math.round(avg_color.r) > 255 || Math.round(avg_color.g) > 255 || Math.round(avg_color.b) > 255 || Math.round(avg_color.a) > 255) {
-            LOGGER.error("Color values are out of range: {}; {}; {}; {}", avg_color.r, avg_color.g, avg_color.b, avg_color.a);
-            throw new RuntimeException("Color values are out of range");
         }
 
         return new ColorReturn(avg_color, color_sum, weight);
