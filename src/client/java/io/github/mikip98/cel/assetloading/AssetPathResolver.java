@@ -125,8 +125,8 @@ public class AssetPathResolver {
                     if (cachedAssetTypes.contains(entryType)) {
                         String assetId = parts[3];
 
-                        String[] parts2 = assetId.split("\\.");
-                        assetId = String.join(".", Arrays.copyOfRange(parts2, 0, parts2.length - 1));
+//                        String[] parts2 = assetId.split("\\.");
+//                        assetId = String.join(".", Arrays.copyOfRange(parts2, 0, parts2.length - 1));
                         LOGGER.info("Caching asset: {}", assetId);
 
                         entryTypes.computeIfAbsent(entryType, k -> new HashMap<>()).put(assetId, new ArrayList<>());
