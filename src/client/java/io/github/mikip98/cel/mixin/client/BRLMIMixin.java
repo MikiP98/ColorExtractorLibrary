@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
-
 @Mixin(value = BlockRenderLayerMapImpl.class, remap = false)
 public class BRLMIMixin {
     @Shadow
@@ -42,18 +40,5 @@ public class BRLMIMixin {
         }
 
         Util.renderLayerModBlockMap = remap;
-
-//        LOGGER.info("BRLMIMixin: {}", remap);
-//        for (Map.Entry<String, List<String>> entry : remap.entrySet()) {
-//            LOGGER.info("  - Layer: {}", entry.getKey());
-//            for (String s : entry.getValue()) {
-//                LOGGER.info("    - Block: {}", s);
-//            }
-//        }
     }
-
-//    @Unique
-//    private static Map<Block, RenderLayer> getBlockRenderLayerMap() {
-//        return blockRenderLayerMap;
-//    }
 }

@@ -1,11 +1,5 @@
 package io.github.mikip98.cel.structures;
 
-import java.util.logging.Logger;
-
-import static java.lang.Double.NaN;
-
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
-
 public class ColorRGBA {
     public double r;
     public double g;
@@ -26,28 +20,61 @@ public class ColorRGBA {
         this.a = 0;
     }
 
+
+    public ColorRGBA copy() {
+        return new ColorRGBA(this.r, this.g, this.b, this.a);
+    }
+
+    public double getMaxRGBA() {
+        return Math.max(r, Math.max(g, Math.max(b, a)));
+    }
+    public double getMaxRGB() {
+        return Math.max(r, Math.max(g, b));
+    }
+
+
     public void add(ColorRGBA other) {
         this.r += other.r;
         this.g += other.g;
         this.b += other.b;
         this.a += other.a;
-
-        if (Double.isNaN(this.r) || Double.isNaN(this.g) || Double.isNaN(this.b) || Double.isNaN(this.a) || Double.isNaN(other.r) || Double.isNaN(other.g) || Double.isNaN(other.b) || Double.isNaN(other.a)) {
-            LOGGER.error("NaN; r: {}; g: {}; b: {}; a: {}; other.r: {}; other.g: {}; other.b: {}; other.a: {}", this.r, this.g, this.b, this.a, other.r, other.g, other.b, other.a);
-            throw new RuntimeException("NaN");
-        }
     }
-    public void divide(int n) {
+
+    public void multiply(ColorRGBA other) {
+        this.r *= other.r;
+        this.g *= other.g;
+        this.b *= other.b;
+        this.a *= other.a;
+    }
+    public void multiply(double n) {
+        this.r *= n;
+        this.g *= n;
+        this.b *= n;
+        this.a *= n;
+    }
+
+    public void divide(double n) {
+//        if (n == 0) throw new RuntimeException("Division by zero");
         this.r /= n;
         this.g /= n;
         this.b /= n;
         this.a /= n;
-
-        if (Double.isNaN(this.r) || Double.isNaN(this.g) || Double.isNaN(this.b) || Double.isNaN(this.a)) {
-            LOGGER.error("NaN; r: {}; g: {}; b: {}; a: {}; n: {}", this.r, this.g, this.b, this.a, n);
-            throw new RuntimeException("NaN");
-        }
     }
+    public void divide(int n) {
+//        if (n == 0) throw new RuntimeException("Division by zero");
+        this.r /= n;
+        this.g /= n;
+        this.b /= n;
+        this.a /= n;
+    }
+
+    public void root(double n) {
+        this.r = Math.pow(this.r, 1 / n);
+        this.g = Math.pow(this.g, 1 / n);
+        this.b = Math.pow(this.b, 1 / n);
+        this.a = Math.pow(this.a, 1 / n);
+    }
+
 
     @Override
     public String toString() {

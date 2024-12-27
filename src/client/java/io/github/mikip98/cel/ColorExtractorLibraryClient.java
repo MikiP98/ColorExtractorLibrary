@@ -2,13 +2,10 @@ package io.github.mikip98.cel;
 
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import io.github.mikip98.cel.enums.AVGTypes;
-import io.github.mikip98.cel.extractors.BlockstateColorExtractor;
-import io.github.mikip98.cel.extractors.LightBlocksExtractor;
-import io.github.mikip98.cel.extractors.TranslucentBlocksExtractor;
+import io.github.mikip98.cel.extractors.*;
 import io.github.mikip98.cel.structures.ColorReturn;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.minecraft.block.Block;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +42,19 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("clear_cache").executes(context -> {
+									BlockstateColorExtractor.clearCache();
+									context.getSource().sendFeedback(Text.of("Blockstate color cache cleared!"));
+
+									BlockModelColorExtractor.clearCache();
+									context.getSource().sendFeedback(Text.of("Block model color cache cleared!"));
+
+									TextureColorExtractor.clearCache();
+									context.getSource().sendFeedback(Text.of("Texture color cache cleared!"));
+
 									if (AssetPathResolver.clearPathCache()) {
-										context.getSource().sendFeedback(Text.of("Cache cleared!"));
+										context.getSource().sendFeedback(Text.of("Path cache cleared!"));
 									} else {
-										context.getSource().sendFeedback(Text.of("Cache clear failed!\nCache is command-proof locked by some mod"));
+										context.getSource().sendFeedback(Text.of("Path cache clear failed!\nCache is command-proof locked by some mod"));
 									}
 									return 0;
 								}))
@@ -91,7 +97,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 												requiredPropertySets.add(requiredPropertySet);
 											}
 											LOGGER.info("Mod: {}; Blockstate: {}; Required properties: {}", modId, blockEntry.getKey(), requiredPropertySets);
-											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.5f, AVGTypes.WEIGHTED_ARITHMETIC);
+											BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 1.0f, AVGTypes.WEIGHTED_ARITHMETIC);
 										}
 									}
 									context.getSource().sendFeedback(Text.of("Done"));

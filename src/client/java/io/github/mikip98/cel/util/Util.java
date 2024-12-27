@@ -9,4 +9,6 @@ import java.util.Map;
 public class Util {
     public static Map<Block, RenderLayer> rawBlockRenderLayerMap;
     public static Map<String, Map<String, List<String>>> renderLayerModBlockMap;
+
+    public static final int colorCacheTimeoutMinutes = 30;
 }

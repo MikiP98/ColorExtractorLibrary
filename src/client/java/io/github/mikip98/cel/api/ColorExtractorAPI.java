@@ -21,7 +21,9 @@ public class ColorExtractorAPI {
 
     public static boolean updatePathCache() { return AssetPathResolver.updatePathCache(); }
 
-    public static boolean clearPathCache() { return AssetPathResolver.clearPathCache(); }
+    public static boolean clearPathCache() {
+        return AssetPathResolver.clearPathCache();
+    }
 
     // Prevents the clearing of the path cache
     public static boolean lockPathCache() { return lockPathCache(false); }

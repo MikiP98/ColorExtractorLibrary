@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.structures.ColorReturn;
+import io.github.mikip98.cel.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -25,8 +26,11 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
 
     private static final Cache<String, ColorReturn> colorCache = CacheBuilder.newBuilder()
             .maximumSize(1024)
-            .expireAfterAccess(Constants.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
+            .expireAfterAccess(Util.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
             .build();
+
+    public static void clearCache() { colorCache.invalidateAll(); }
+
 
     public static ColorReturn getAverageModelColor(String modId, String modelId, float weightedness, AVGTypes avgType) {
         String cacheKey = modId + "_" + modelId;
@@ -64,15 +68,21 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                             texturePathId = texturePathSplit[1];
                         }
 
-                        ColorReturn textureColor = TextureColorExtractor.getAverageTextureColor(textureModId, texturePathId, avgType);
+                        ColorReturn textureColor = TextureColorExtractor.getAverageTextureColor(textureModId, texturePathId, weightedness, avgType);
                         if (textureColor != null) {
+                            ++totalTexturePathCount;
                             colorReturn.add(textureColor);
                         }
                         LOGGER.info("Model path: {}; From mod: {}; Color: {}", texturePathId, textureModId, colorReturn);
                     }
-                    totalTexturePathCount += texturePaths.size();
                 }
             }
+            if (totalTexturePathCount == 0) {
+                LOGGER.error("Failed to get texture paths for model `{}` from mod `{}`", modelId, modId);
+                return null;
+            }
+            LOGGER.info("Total texture path count: {}", totalTexturePathCount);
+
             colorReturn.color_avg.divide(totalTexturePathCount);
             colorReturn.color_avg = postProcessData(colorReturn, weightedness);
 

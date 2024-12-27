@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import io.github.mikip98.cel.assetloading.AssetPathResolver;
 import io.github.mikip98.cel.enums.AVGTypes;
 import io.github.mikip98.cel.structures.ColorReturn;
+import io.github.mikip98.cel.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -25,7 +26,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 
     private static final Cache<String, ColorReturn> colorCache = CacheBuilder.newBuilder()
             .maximumSize(256)
-            .expireAfterAccess(Constants.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
+            .expireAfterAccess(Util.colorCacheTimeoutMinutes, TimeUnit.MINUTES) // Time-based expiration to reduce library memory usage during non-use
             .build();
 
     public static void clearCache() {
@@ -72,12 +73,16 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 
                         ColorReturn modelColor = BlockModelColorExtractor.getAverageModelColor(modelModId, modelPathId, weightedness, avgType);
                         if (modelColor != null) {
+                            ++totalModelPathCount;
                             colorReturn.add(modelColor);
                         }
                         LOGGER.info("Model path: {}; From mod: {}; Color: {}", modelPathId, modelModId, colorReturn);
                     }
-                    totalModelPathCount += modelPaths.size();
                 }
+            }
+            if (totalModelPathCount == 0) {
+                LOGGER.error("Failed to get model paths for blockstate `{}` from mod `{}`", blockstateId, modId);
+                return null;
             }
             colorReturn.color_avg.divide(totalModelPathCount);
             colorReturn.color_avg = postProcessData(colorReturn, weightedness);
@@ -177,9 +182,10 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                                     modelPaths.add(((JsonObject) modelEntry).get("model").getAsString());
                                 }
 
-                            } else {
-//                                LOGGER.info("Key '{}' does not contain required properties: {}", key, requiredPropertySets);
                             }
+                            //else {
+//                                LOGGER.info("Key '{}' does not contain required properties: {}", key, requiredPropertySets);
+                            //}
                         }
 
                     } else if (keys.contains("multipart")) {
