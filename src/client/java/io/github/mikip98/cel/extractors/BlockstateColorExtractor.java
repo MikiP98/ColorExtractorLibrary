@@ -51,7 +51,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
             }
             colorReturn = new ColorReturn();
 
-            LOGGER.info("Blockstate path: {} in mod files: {}", blockstatePaths.assetPath, blockstatePaths.jarPaths);
+//            LOGGER.info("Blockstate path: {} in mod files: {}", blockstatePaths.assetPath, blockstatePaths.jarPaths);
 
             int totalModelPathCount = 0;
             String assetPath = blockstatePaths.assetPath;
@@ -76,7 +76,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                             ++totalModelPathCount;
                             colorReturn.add(modelColor);
                         }
-                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", modelPathId, modelModId, colorReturn);
+//                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", modelPathId, modelModId, colorReturn);
                     }
                 }
             }
@@ -123,8 +123,8 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 //                    LOGGER.info("Blockstate JSON keys: {}", keys);
 
                     if (keys.contains("variants")) {
-                        LOGGER.info("Blockstate type: 'variants'");
-                        LOGGER.info("Type of variants: {}", blockstateJson.get("variants").getClass().getName());
+//                        LOGGER.info("Blockstate type: 'variants'");
+//                        LOGGER.info("Type of variants: {}", blockstateJson.get("variants").getClass().getName());
 
                         JsonObject variants = blockstateJson.getAsJsonObject("variants");
 
@@ -189,7 +189,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                         }
 
                     } else if (keys.contains("multipart")) {
-                        LOGGER.info("Blockstate type: 'multipart'");
+//                        LOGGER.info("Blockstate type: 'multipart'");
                         JsonArray multipart = (JsonArray) blockstateJson.get("multipart");
 
                         // TODO: Add required properties check
@@ -198,14 +198,14 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                             JsonObject part = (JsonObject) partObj;
                             Object apply = part.get("apply");
                             if (apply instanceof JsonArray) {
-                                LOGGER.info("Apply is JSONArray");
+//                                LOGGER.info("Apply is JSONArray");
 
                                 for (Object elementObj : (JsonArray) apply) {
                                     JsonObject element = (JsonObject) elementObj;
                                     modelPaths.add(element.get("model").getAsString());
                                 }
                             } else {
-                                LOGGER.info("Apply is JSONObject");
+//                                LOGGER.info("Apply is JSONObject");
 
                                 modelPaths.add(((JsonObject) apply).get("model").getAsString());
                             }
@@ -226,8 +226,8 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
             LOGGER.error("Error opening JAR/ZIP file: {};\nException: {};\nStacktrace: {}", jarPath, e.getMessage(), e.getStackTrace());
         }
 
-        LOGGER.info("Extracted {} model paths from blockstate file: {}", modelPaths.size(), blockstatePath);
-        LOGGER.info("Model paths: {}", modelPaths);
+//        LOGGER.info("Extracted {} model paths from blockstate file: {}", modelPaths.size(), blockstatePath);
+//        LOGGER.info("Model paths: {}", modelPaths);
 
         return modelPaths;
     }

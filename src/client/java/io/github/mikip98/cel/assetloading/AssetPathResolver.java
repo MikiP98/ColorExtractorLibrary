@@ -178,7 +178,7 @@ public class AssetPathResolver {
         }
 
         List<String> files = blockstates.get(blockstateID);
-        LOGGER.info("Found blockstate `{}` in {} files: {}", blockstateID, files.size(), files);
+//        LOGGER.info("Found blockstate `{}` in {} files: {}", blockstateID, files.size(), files);
 
         return generatePaths(files, modID, "blockstates", blockstateID, "json");
     }
@@ -203,7 +203,7 @@ public class AssetPathResolver {
         }
 
         List<String> files = models.get(modelId);
-        LOGGER.info("Found model `{}` in {} files: {}", modelId, files.size(), files);
+//        LOGGER.info("Found model `{}` in {} files: {}", modelId, files.size(), files);
 
         return generatePaths(files, modId, "models", modelId, "json");
     }
@@ -228,7 +228,7 @@ public class AssetPathResolver {
         }
 
         List<String> files = textures.get(textureId);
-        LOGGER.info("Found texture `{}` in {} files: {}", textureId, files.size(), files);
+//        LOGGER.info("Found texture `{}` in {} files: {}", textureId, files.size(), files);
 
         return generatePaths(files, modId, "textures", textureId, "png");
     }

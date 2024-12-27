@@ -8,6 +8,16 @@ import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 public abstract class BaseColorExtractor {
 
     public static ColorRGBA postProcessData(ColorReturn colorReturn, float weightedness) {
+        if (weightedness > 1 || weightedness < 0) {
+            LOGGER.error("weightedness is not between 0 and 1: {}", weightedness);
+            throw new RuntimeException("weightedness is not between 0 and 1");
+        }
+
+        if (Math.round(colorReturn.color_avg.r) > 255 || Math.round(colorReturn.color_avg.g) > 255 || Math.round(colorReturn.color_avg.b) > 255 || Math.round(colorReturn.color_avg.a) > 255) {
+            LOGGER.error("Color values are out of range: {}; {}; {}; {}", colorReturn.color_avg.r, colorReturn.color_avg.g, colorReturn.color_avg.b, colorReturn.color_avg.a);
+            throw new RuntimeException("Color values are out of range");
+        }
+
         double weight_sum = colorReturn.weight_sum;
 
         if (weight_sum == 0) {
@@ -30,6 +40,11 @@ public abstract class BaseColorExtractor {
                 color_sum.b / weight_sum,
                 color_sum.a / weight_sum
         );
+
+        if (Math.round(color_avg.r) > 255 || Math.round(color_avg.g) > 255 || Math.round(color_avg.b) > 255 || Math.round(color_avg.a) > 255) {
+            LOGGER.error("Color values are out of range: {}; {}; {}; {}", color_avg.r, color_avg.g, color_avg.b, color_avg.a);
+            throw new RuntimeException("Color values are out of range");
+        }
 
         return new ColorRGBA(
                 color_weighted_avg.r * weightedness + color_avg.r * (1 - weightedness),

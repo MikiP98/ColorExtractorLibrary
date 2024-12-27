@@ -43,12 +43,12 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
             AssetPathResolver.AssetPaths modelPaths = AssetPathResolver.getModelPaths(modId, modelId);
 
             if (modelPaths == null || modelPaths.jarPaths == null || modelPaths.jarPaths.isEmpty() || modelPaths.assetPath == null || modelPaths.assetPath.isEmpty()) {
-                LOGGER.warn("Failed to get model paths for model `{}` from mod `{}`", modelId, modId);
+                LOGGER.error("Failed to get model paths for model `{}` from mod `{}`", modelId, modId);
                 return null;
             }
             colorReturn = new ColorReturn();
 
-            LOGGER.info("Model path: {} in mod files: {}", modelPaths.assetPath, modelPaths.jarPaths);
+//            LOGGER.info("Model path: {} in mod files: {}", modelPaths.assetPath, modelPaths.jarPaths);
 
             int totalTexturePathCount = 0;
             String assetPath = modelPaths.assetPath;
@@ -73,7 +73,7 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                             ++totalTexturePathCount;
                             colorReturn.add(textureColor);
                         }
-                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", texturePathId, textureModId, colorReturn);
+//                        LOGGER.info("Model path: {}; From mod: {}; Color: {}", texturePathId, textureModId, colorReturn);
                     }
                 }
             }
@@ -81,7 +81,7 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                 LOGGER.error("Failed to get texture paths for model `{}` from mod `{}`", modelId, modId);
                 return null;
             }
-            LOGGER.info("Total texture path count: {}", totalTexturePathCount);
+//            LOGGER.info("Total texture path count: {}", totalTexturePathCount);
 
             colorReturn.color_avg.divide(totalTexturePathCount);
             colorReturn.color_avg = postProcessData(colorReturn, weightedness);
@@ -94,8 +94,8 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
     }
 
     public static @NotNull List<String> extractTexturePathsFromModel(String jarPath, String modelPath) {
-        LOGGER.info("Extracting texture paths from model: {}", modelPath);
-        LOGGER.info("In jar: {}", jarPath);
+//        LOGGER.info("Extracting texture paths from model: {}", modelPath);
+//        LOGGER.info("In jar: {}", jarPath);
         List<String> texturePaths = new ArrayList<>();
 
         // Create a Gson instance
@@ -111,13 +111,13 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                 try (InputStream inputStream = zipFile.getInputStream(entry); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
                     JsonObject modelJson = gson.fromJson(reader, JsonObject.class);  // Or use your specific class
-                    LOGGER.info("Blockstate JSON: {}", modelJson);
+//                    LOGGER.info("Blockstate JSON: {}", modelJson);
 
                     if (modelJson.keySet().contains("textures")) {
 
                         JsonObject textures = (JsonObject) modelJson.get("textures");
 //                        Set<String> textureKeys = textures.keySet();
-                        LOGGER.info("Textures: " + textures.entrySet());
+//                        LOGGER.info("Textures: " + textures.entrySet());
 
                         // TODO: Add weight from model faces, etc.
                         // TODO: Add textures from parent models support
@@ -126,7 +126,7 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                             texturePaths.add(textureEntry.getValue().getAsString());
                         }
                     } else {
-                        LOGGER.warn("Model JSON '{}' in mod file '{}' does not contain 'textures'!\nCEL currently does not support models inheriting textures from parent model.", modelPath, jarPath);
+                        LOGGER.error("Model JSON '{}' in mod file '{}' does not contain 'textures'!\nCEL currently does not support models inheriting textures from parent model.", modelPath, jarPath);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Failed to read JSON file: {};\nException: {};\nStacktrace: {}", modelPath, e.getMessage(), e.getStackTrace());
@@ -139,8 +139,8 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
             LOGGER.error("Failed to open JAR/ZIP file: {};\nexception: {};\nstacktrace: {}", jarPath, e.getMessage(), e.getStackTrace());
         }
 
-        LOGGER.info("Extracted {} texture paths from model file: {}", texturePaths.size(), modelPath);
-        LOGGER.info("Texture paths: {}", texturePaths);
+//        LOGGER.info("Extracted {} texture paths from model file: {}", texturePaths.size(), modelPath);
+//        LOGGER.info("Texture paths: {}", texturePaths);
 
         return texturePaths;
     }
