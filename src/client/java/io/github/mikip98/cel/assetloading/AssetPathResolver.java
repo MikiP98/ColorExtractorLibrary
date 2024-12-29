@@ -15,7 +15,7 @@ import java.util.zip.ZipFile;
 import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
 
 public class AssetPathResolver {
-    // Mod ID -> Asset Type -> List of assets
+    // Mod ID -> Asset Type -> Assets -> List of jars that include this asset
     public static Map<String, Map<String, Map<String, List<String>>>> assetPaths = new HashMap<>();
     public static boolean arePathsCached = false;
     public static HashSet<Short> pathsLocks = new HashSet<>();
@@ -108,38 +108,74 @@ public class AssetPathResolver {
 
                     if (!Objects.equals(lastModID, currentModID)) {
                         if (lastModID != null) {
-                            assetPaths.put(lastModID, entryTypes);
+                            addToCache(lastModID, entryTypes);
                         }
                         lastModID = currentModID;
-                        entryTypes.clear();
+                        entryTypes = new HashMap<>();
                     }
 
                     if (parts.length < 3) {
                         LOGGER.warn("Invalid or not supported entry: {}", entry.getName());
                         continue;
                     }
-                    LOGGER.info("Parts: {}", Arrays.toString(parts));
                     // TODO: fix, default vanilla textures are not loading correctly, only gui/... textures are being cached
 
                     String entryType = parts[2];
+
                     if (cachedAssetTypes.contains(entryType)) {
                         String assetId = parts[3];
 
-//                        String[] parts2 = assetId.split("\\.");
-//                        assetId = String.join(".", Arrays.copyOfRange(parts2, 0, parts2.length - 1));
-                        LOGGER.info("Caching asset: {}", assetId);
+                        if (entryType.equals("textures")) {
+                            String[] assetIdParts = assetId.split("/", 2);
+                            if (!(assetIdParts[0].equals("block") || assetIdParts[0].equals("item"))) {
+                                continue;
+                            }
+                        }
 
-                        entryTypes.computeIfAbsent(entryType, k -> new HashMap<>()).put(assetId, new ArrayList<>());
+//                        LOGGER.info("Caching asset: {}; Under: {}, From mod: {}", assetId, entryType, lastModID);
+
+                        entryTypes.computeIfAbsent(entryType, k -> new HashMap<>()).putIfAbsent(assetId, new ArrayList<>());
                         entryTypes.get(entryType).get(assetId).add(file.getName());
                     }
                 }
             }
-            assetPaths.put(lastModID, entryTypes);
+            // Save any unsaved entries from the last mod
+            addToCache(lastModID, entryTypes);
         } catch (ZipException e) {
             LOGGER.error("Failed to handle zip or jar (ZIP)!;\n{}", e.getMessage());
         } catch (IOException e) {
             LOGGER.error("Failed to handle zip or jar (IO)!;\n{}", e.getMessage());
         }
+    }
+
+    public static void addToCache(String modId, Map<String, Map<String, List<String>>> entryTypes) {
+        if (!entryTypes.isEmpty()) {
+            if (!assetPaths.containsKey(modId) || assetPaths.get(modId) == null) {
+                assetPaths.put(modId, entryTypes);
+
+            } else {
+                Map<String, Map<String, List<String>>> existingEntryTypes = assetPaths.get(modId);
+                for (Map.Entry<String, Map<String, List<String>>> entryType : existingEntryTypes.entrySet()) {
+
+                    if (!entryTypes.containsKey(entryType.getKey())) {
+                        entryTypes.put(entryType.getKey(), entryType.getValue());
+
+                    } else {
+                        for (Map.Entry<String, List<String>> entryMap : entryType.getValue().entrySet()) {
+
+                            if (!entryTypes.get(entryMap.getKey()).containsKey(entryMap.getKey())) {
+                                entryTypes.get(entryMap.getKey()).put(entryMap.getKey(), entryMap.getValue());
+
+                            } else {
+                                entryTypes.get(entryMap.getKey()).get(entryMap.getKey()).addAll(entryMap.getValue());
+                            }
+                        }
+                    }
+                }
+                assetPaths.put(modId, entryTypes);
+            }
+        }
+//        LOGGER.info("Finished caching mod: {}; Found {} entry types", lastModID, entryTypes.keySet());
     }
 
     public static boolean clearPathCache() {
@@ -167,6 +203,8 @@ public class AssetPathResolver {
 
 
     public static AssetPaths getBlockstatePaths(String modID, String blockstateID) {
+        blockstateID = blockstateID + ".json";
+
 //        LOGGER.info("Getting blockstate `{}` from mod `{}`", blockstateID, modID);
 
         if (!assetPaths.containsKey(modID)) {
@@ -190,10 +228,12 @@ public class AssetPathResolver {
         List<String> files = blockstates.get(blockstateID);
 //        LOGGER.info("Found blockstate `{}` in {} files: {}", blockstateID, files.size(), files);
 
-        return generatePaths(files, modID, "blockstates", blockstateID, "json");
+        return generatePaths(files, modID, "blockstates", blockstateID);
     }
 
     public static AssetPaths getModelPaths(String modId, String modelId) {
+        modelId = modelId + ".json";
+
         if (!assetPaths.containsKey(modId)) {
             LOGGER.warn("Mod `{}` does not exist!", modId);
             return null;
@@ -215,10 +255,12 @@ public class AssetPathResolver {
         List<String> files = models.get(modelId);
 //        LOGGER.info("Found model `{}` in {} files: {}", modelId, files.size(), files);
 
-        return generatePaths(files, modId, "models", modelId, "json");
+        return generatePaths(files, modId, "models", modelId);
     }
 
     public static AssetPaths getTexturePaths(String modId, String textureId) {
+        textureId = textureId + ".png";
+
         if (!assetPaths.containsKey(modId)) {
             LOGGER.warn("Mod `{}` does not exist!", modId);
             return null;
@@ -233,21 +275,21 @@ public class AssetPathResolver {
         Map<String, List<String>> textures = modAssets.get("textures");
         if (!textures.containsKey(textureId)) {
             LOGGER.warn("Texture `{}` does not exist!", textureId);
-            LOGGER.warn("Available textures: {}", textures);
+//            LOGGER.warn("Available textures: {}", textures);
             return null;
         }
 
         List<String> files = textures.get(textureId);
 //        LOGGER.info("Found texture `{}` in {} files: {}", textureId, files.size(), files);
 
-        return generatePaths(files, modId, "textures", textureId, "png");
+        return generatePaths(files, modId, "textures", textureId);
     }
 
-    public static AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID, String assetExtension) {
+    public static AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID) {
         AssetPaths paths = new AssetPaths();
 
         paths.jarPaths = new ArrayList<>();
-        paths.assetPath = "assets/" + modID + "/" + assetType + "/" + assetID + "." + assetExtension;
+        paths.assetPath = "assets/" + modID + "/" + assetType + "/" + assetID;
 
         Path modDir = FabricLoader.getInstance().getGameDir().resolve("mods");
 

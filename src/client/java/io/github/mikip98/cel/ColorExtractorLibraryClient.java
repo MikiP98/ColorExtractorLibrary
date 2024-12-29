@@ -86,6 +86,8 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = LightBlocksExtractor.getLightEmittingBlocksData();
 									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										String modId = entry.getKey();
+										LOGGER.info("- Mod: {}", modId);
+
 										Map<String, Map<Byte, Set<Map<String, Comparable>>>> blockIds = entry.getValue();
 										for (Map.Entry<String, Map<Byte, Set<Map<String, Comparable>>>> blockEntry : blockIds.entrySet()) {
 											List<Map<String, Comparable>> requiredPropertySets = new ArrayList<>();
@@ -96,12 +98,11 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 												}
 												requiredPropertySets.add(requiredPropertySet);
 											}
-											LOGGER.info("Mod: {}; Blockstate: {}; Required properties: {}", modId, blockEntry.getKey(), requiredPropertySets);
 											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
 											if (colorReturn != null) {
-												LOGGER.info("  - Color: {}", colorReturn.color_avg);
+												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: {}", blockEntry.getKey(), requiredPropertySets, colorReturn.color_avg);
 											} else {
-												LOGGER.info("  - Color: null");
+												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: null", blockEntry.getKey(), requiredPropertySets);
 											}
 										}
 									}
