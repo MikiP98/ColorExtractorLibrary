@@ -51,11 +51,8 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 									TextureColorExtractor.clearCache();
 									context.getSource().sendFeedback(Text.of("Texture color cache cleared!"));
 
-									if (AssetPathResolver.clearPathCache()) {
-										context.getSource().sendFeedback(Text.of("Path cache cleared!"));
-									} else {
-										context.getSource().sendFeedback(Text.of("Path cache clear failed!\nCache is command-proof locked by some mod"));
-									}
+									AssetPathResolver.assetPaths.clear();
+									context.getSource().sendFeedback(Text.of("Path cache cleared!"));
 									return 0;
 								}))
 						)
