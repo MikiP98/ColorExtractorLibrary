@@ -1,6 +1,6 @@
-package io.github.mikip98.cel.extractors;
+package io.github.mikip98.del.extractors;
 
-import io.github.mikip98.cel.util.Util;
+import io.github.mikip98.del.util.Util;
 
 import java.util.List;
 import java.util.Map;

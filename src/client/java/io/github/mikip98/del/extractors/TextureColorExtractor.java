@@ -1,12 +1,12 @@
-package io.github.mikip98.cel.extractors;
+package io.github.mikip98.del.extractors;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import io.github.mikip98.cel.assetloading.AssetPathResolver;
-import io.github.mikip98.cel.enums.AVGTypes;
-import io.github.mikip98.cel.structures.ColorRGBA;
-import io.github.mikip98.cel.structures.ColorReturn;
-import io.github.mikip98.cel.util.Util;
+import io.github.mikip98.del.assetloading.AssetPathResolver;
+import io.github.mikip98.del.enums.AVGTypes;
+import io.github.mikip98.del.structures.ColorRGBA;
+import io.github.mikip98.del.structures.ColorReturn;
+import io.github.mikip98.del.util.Util;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
+import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 
 public class TextureColorExtractor extends BaseColorExtractor {
 

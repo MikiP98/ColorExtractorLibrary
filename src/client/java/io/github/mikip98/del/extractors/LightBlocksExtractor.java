@@ -1,4 +1,4 @@
-package io.github.mikip98.cel.extractors;
+package io.github.mikip98.del.extractors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

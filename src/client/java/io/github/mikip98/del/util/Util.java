@@ -1,4 +1,4 @@
-package io.github.mikip98.cel.util;
+package io.github.mikip98.del.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.render.RenderLayer;

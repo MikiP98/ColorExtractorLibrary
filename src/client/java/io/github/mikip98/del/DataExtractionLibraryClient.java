@@ -1,9 +1,9 @@
-package io.github.mikip98.cel;
+package io.github.mikip98.del;
 
-import io.github.mikip98.cel.assetloading.AssetPathResolver;
-import io.github.mikip98.cel.enums.AVGTypes;
-import io.github.mikip98.cel.extractors.*;
-import io.github.mikip98.cel.structures.ColorReturn;
+import io.github.mikip98.del.assetloading.AssetPathResolver;
+import io.github.mikip98.del.enums.AVGTypes;
+import io.github.mikip98.del.extractors.*;
+import io.github.mikip98.del.structures.ColorReturn;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.text.Text;
@@ -14,9 +14,9 @@ import java.util.*;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class ColorExtractorLibraryClient implements ClientModInitializer {
-	public static final String MOD_NAME = "Color Extractor Library";
-	public static final String MOD_ID = "color-extractor-library";
+public class DataExtractionLibraryClient implements ClientModInitializer {
+	public static final String MOD_NAME = "Data Extraction Library";
+	public static final String MOD_ID = "data-extraction-library";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -31,7 +31,7 @@ public class ColorExtractorLibraryClient implements ClientModInitializer {
 		LOGGER.info("{} is initializing!", MOD_NAME);
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-				dispatcher.register(literal("color_extractor_library")
+				dispatcher.register(literal("data_extraction_library")
 						.then(literal("cache")
 								.then(literal("update_cache").executes(context -> {
 									if (AssetPathResolver.updatePathCache()) {

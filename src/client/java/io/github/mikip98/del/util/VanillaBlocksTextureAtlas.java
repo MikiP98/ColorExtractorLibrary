@@ -1,9 +1,9 @@
-package io.github.mikip98.cel.util;
+package io.github.mikip98.del.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
+import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 
 public class VanillaBlocksTextureAtlas {
     private static final Map<String, double[]> BLOCK = new HashMap<>();

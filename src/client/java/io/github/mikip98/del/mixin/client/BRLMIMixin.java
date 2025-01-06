@@ -1,6 +1,6 @@
-package io.github.mikip98.cel.mixin.client;
+package io.github.mikip98.del.mixin.client;
 
-import io.github.mikip98.cel.util.Util;
+import io.github.mikip98.del.util.Util;
 import net.fabricmc.fabric.impl.blockrenderlayer.BlockRenderLayerMapImpl;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.RenderLayer;

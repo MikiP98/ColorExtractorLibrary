@@ -1,4 +1,4 @@
-package io.github.mikip98.cel.assetloading;
+package io.github.mikip98.del.assetloading;
 
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
+import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 
 public class AssetPathResolver {
     // Mod ID -> Asset Type -> Assets -> List of jars that include this asset

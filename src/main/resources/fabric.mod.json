@@ -1,30 +1,30 @@
 {
 	"schemaVersion": 1,
-	"id": "color-extractor-library",
+	"id": "data-extraction-library",
 	"version": "${version}",
-	"name": "Color Extractor Library",
-	"description": "Library for extracting average color of blocks and textures",
+	"name": "Data Extraction Library",
+	"description": "Library for extracting the average color of blocks and textures as well as some other data",
 	"authors": [
 		"MikiP98 | https://github.com/MikiP98"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/color-extractor-library",
-		"sources": "https://github.com/MikiP98/ColorExtractorLibrary"
+		"homepage": "https://modrinth.com/mod/data-extraction-library",
+		"sources": "https://github.com/MikiP98/DataExtractionLibrary"
 	},
 	"license": "Apache-2.0",
-	"icon": "assets/color-extractor-library/icon.png",
+	"icon": "assets/data-extraction-library/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [
-			"io.github.mikip98.cel.ColorExtractorLibrary"
+			"io.github.mikip98.del.DataExtractionLibrary"
 		],
 		"client": [
-			"io.github.mikip98.cel.ColorExtractorLibraryClient"
+			"io.github.mikip98.del.DataExtractionLibraryClient"
 		]
 	},
 	"mixins": [
 		{
-			"config": "color-extractor-library.client.mixins.json",
+			"config": "data-extraction-library.client.mixins.json",
 			"environment": "client"
 		}
 	],

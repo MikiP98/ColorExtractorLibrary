@@ -1,9 +1,9 @@
-package io.github.mikip98.cel.extractors;
+package io.github.mikip98.del.extractors;
 
-import io.github.mikip98.cel.structures.ColorRGBA;
-import io.github.mikip98.cel.structures.ColorReturn;
+import io.github.mikip98.del.structures.ColorRGBA;
+import io.github.mikip98.del.structures.ColorReturn;
 
-import static io.github.mikip98.cel.ColorExtractorLibraryClient.LOGGER;
+import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 
 public abstract class BaseColorExtractor {
 

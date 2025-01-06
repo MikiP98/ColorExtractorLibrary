@@ -1,4 +1,4 @@
-package io.github.mikip98.cel.structures;
+package io.github.mikip98.del.structures;
 
 public class ColorRGBA {
     public double r;
