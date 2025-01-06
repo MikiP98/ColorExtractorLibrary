@@ -1,9 +1,9 @@
 package io.github.mikip98.del.api;
 
 import io.github.mikip98.del.enums.AVGTypes;
-import io.github.mikip98.del.extractors.BlockModelColorExtractor;
-import io.github.mikip98.del.extractors.BlockstateColorExtractor;
-import io.github.mikip98.del.extractors.TextureColorExtractor;
+import io.github.mikip98.del.extractors.color.BlockModelColorExtractor;
+import io.github.mikip98.del.extractors.color.BlockstateColorExtractor;
+import io.github.mikip98.del.extractors.color.TextureColorExtractor;
 import io.github.mikip98.del.structures.ColorReturn;
 
 import java.util.ArrayList;

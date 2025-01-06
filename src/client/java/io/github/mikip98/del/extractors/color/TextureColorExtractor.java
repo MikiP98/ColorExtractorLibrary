@@ -1,4 +1,4 @@
-package io.github.mikip98.del.extractors;
+package io.github.mikip98.del.extractors.color;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

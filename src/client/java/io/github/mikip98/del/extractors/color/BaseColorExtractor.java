@@ -1,4 +1,4 @@
-package io.github.mikip98.del.extractors;
+package io.github.mikip98.del.extractors.color;
 
 import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
