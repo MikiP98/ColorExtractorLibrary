@@ -81,7 +81,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                 }
             }
             if (totalModelPathCount == 0) {
-                LOGGER.error("Failed to get model paths for blockstate `{}` from mod `{}; Or failed to precess all its models`", blockstateId, modId);
+                LOGGER.error("Failed to get model paths for blockstate `{}` from mod `{}; Or failed to process all its existing models`", blockstateId, modId);
                 return null;
             }
             colorReturn.color_avg.divide(totalModelPathCount);
