@@ -23,6 +23,7 @@ public class ColorReturn {
         this.weight_sum += other.weight_sum;
     }
 
+
     @Override
     public String toString() {
         return "ColorReturn{" +

@@ -1,6 +1,7 @@
 package io.github.mikip98.del.assetloading;
 
 import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,17 @@ public class AssetPathResolver {
         }
 
         assetPaths = newAssetPaths;
+
+//        LOGGER.info("Path cache:");
+//        for (Map.Entry<String, Map<String, Map<String, List<String>>>> entry : assetPaths.entrySet()) {
+//            LOGGER.info("  - ModID: {}", entry.getKey());
+//            for (Map.Entry<String, Map<String, List<String>>> assetEntry : entry.getValue().entrySet()) {
+//                LOGGER.info("    - Asset entry: {}; Length: {}", assetEntry.getKey(), assetEntry.getValue().size());
+//                for (Map.Entry<String, List<String>> asset : assetEntry.getValue().entrySet()) {
+//                    LOGGER.info("      - Asset: {}", asset);
+//                }
+//            }
+//        }
 
         final int size = getCacheSize();
         LOGGER.info("Path cache updated! Bytes: {}; Kilobytes: {}; Megabytes: {}", size,
@@ -132,36 +144,45 @@ public class AssetPathResolver {
         }
     }
 
-    public static void addToCache(String modId, Map<String, Map<String, List<String>>> entryTypes, Map<String, Map<String, Map<String, List<String>>>> newAssetPaths) {
-        if (!entryTypes.isEmpty()) {
+    public static void addToCache(String modId, Map<String, Map<String, List<String>>> assetTypeEntries, Map<String, Map<String, Map<String, List<String>>>> newAssetPaths) {
+        if (!assetTypeEntries.isEmpty()) {
             if (!newAssetPaths.containsKey(modId) || newAssetPaths.get(modId) == null) {
-                newAssetPaths.put(modId, entryTypes);
+                newAssetPaths.put(modId, assetTypeEntries);
 
             } else {
-                Map<String, Map<String, List<String>>> existingEntryTypes = newAssetPaths.get(modId);
-                for (Map.Entry<String, Map<String, List<String>>> entryType : existingEntryTypes.entrySet()) {
+                Map<String, Map<String, List<String>>> existingAssetTypeEntries = newAssetPaths.get(modId);
 
-                    if (!entryTypes.containsKey(entryType.getKey())) {
-                        entryTypes.put(entryType.getKey(), entryType.getValue());
+                // Go through `assetTypeEntry` and add it to the `newAssetPaths`
+                for (Map.Entry<String, Map<String, List<String>>> assetTypeEntry : assetTypeEntries.entrySet()) {
+                    // AssetTypeEntry is e.g.: `blockstates`, `models`, `textures`
+                    // Each one of them contains a map of `assetId` -> list of jars that contain this asset
+
+                    if (!existingAssetTypeEntries.containsKey(assetTypeEntry.getKey()) || existingAssetTypeEntries.get(assetTypeEntry.getKey()) == null) {
+                        existingAssetTypeEntries.put(assetTypeEntry.getKey(), assetTypeEntry.getValue());
 
                     } else {
-                        for (Map.Entry<String, List<String>> entryMap : entryType.getValue().entrySet()) {
+                        Map<String, List<String>> existingAssetTypeEntry = existingAssetTypeEntries.get(assetTypeEntry.getKey());
 
-                            if (entryTypes.get(entryMap.getKey()) == null) {
-                                LOGGER.error("Corrupted path cache: {}; From mod: {}; Replacing with empty map", entryMap.getKey(), modId);
-                                entryTypes.put(entryMap.getKey(), new HashMap<>());
-                            }
+                        // Go through every asset in `assetTypeEntry` and add its value to the `existingAssetTypeEntries` value
+                        for (Map.Entry<String, List<String>> assetEntry : assetTypeEntry.getValue().entrySet()) {
+                            // Each assetEntry contains a map of `assetId` -> list of jars that contain this asset
+                            // If an existing assetEntry with the same key IS NOT found, add this assetEntry to the `existingAssetTypeEntries`
+                            // If an existing assetEntry with the same key IS found, add the values of the new assetEntry to the existing assetEntry
 
-                            if (!entryTypes.get(entryMap.getKey()).containsKey(entryMap.getKey())) {
-                                entryTypes.get(entryMap.getKey()).put(entryMap.getKey(), entryMap.getValue());
-
+                            if (!existingAssetTypeEntry.containsKey(assetEntry.getKey()) || existingAssetTypeEntry.get(assetEntry.getKey()) == null) {
+                                existingAssetTypeEntry.put(assetEntry.getKey(), assetEntry.getValue());
                             } else {
-                                entryTypes.get(entryMap.getKey()).get(entryMap.getKey()).addAll(entryMap.getValue());
+                                existingAssetTypeEntry.get(assetEntry.getKey()).addAll(assetEntry.getValue());
                             }
                         }
+
+                        // Put the updated `existingAssetTypeEntry` back into the `existingAssetTypeEntries`
+                        existingAssetTypeEntries.put(assetTypeEntry.getKey(), existingAssetTypeEntry);
                     }
                 }
-                newAssetPaths.put(modId, entryTypes);
+
+                // Put the updated `existingAssetTypeEntries` back into the `newAssetPaths`
+                newAssetPaths.put(modId, existingAssetTypeEntries);
             }
         }
 //        LOGGER.info("Finished caching mod: {}; Found {} entry types", lastModID, entryTypes.keySet());
@@ -194,7 +215,7 @@ public class AssetPathResolver {
 
         Map<String, List<String>> assets = modAssetCollection.get(assetType + "s");
         if (!assets.containsKey(assetId)) {
-            LOGGER.warn("{} `{}` does not exist!", new StringBuilder().append(Character.toTitleCase(assetType.charAt(0))).append(assetType.substring(1)), assetId);
+            LOGGER.warn("{} `{}` does not exist in mod `{}`!", new StringBuilder().append(Character.toTitleCase(assetType.charAt(0))).append(assetType.substring(1)), assetId, modId);
 //            LOGGER.warn("Available {}s: {}", assetType, assets);
             return null;
         }
@@ -205,7 +226,7 @@ public class AssetPathResolver {
         return generatePaths(files, modId, assetType + "s", assetId);
     }
 
-    public static AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID) {
+    public static @NotNull AssetPaths generatePaths(List<String> modFiles, String modID, String assetType, String assetID) {
         AssetPaths paths = new AssetPaths();
 
         paths.jarPaths = new ArrayList<>();

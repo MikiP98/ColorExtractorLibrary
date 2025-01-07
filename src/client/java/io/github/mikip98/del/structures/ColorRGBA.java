@@ -25,9 +25,6 @@ public class ColorRGBA {
         return new ColorRGBA(this.r, this.g, this.b, this.a);
     }
 
-    public double getMaxRGBA() {
-        return Math.max(r, Math.max(g, Math.max(b, a)));
-    }
     public double getMaxRGB() {
         return Math.max(r, Math.max(g, b));
     }
@@ -73,6 +70,13 @@ public class ColorRGBA {
         this.g = Math.pow(this.g, 1 / n);
         this.b = Math.pow(this.b, 1 / n);
         this.a = Math.pow(this.a, 1 / n);
+    }
+
+    public void round() {
+        this.r = Math.round(this.r);
+        this.g = Math.round(this.g);
+        this.b = Math.round(this.b);
+        this.a = Math.round(this.a);
     }
 
 

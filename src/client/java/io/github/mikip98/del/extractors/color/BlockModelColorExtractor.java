@@ -117,28 +117,33 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
 
                     if (modelJson.has("parent")) {
                         String[] parentModelPathParts = modelJson.get("parent").getAsString().split(":", 2);
-                        String modId;
+                        String parentModId;
                         String parentModelId;
 
                         if (parentModelPathParts.length == 1) {
-                            modId = "minecraft";
+                            parentModId = "minecraft";
                             parentModelId = parentModelPathParts[0];
                         } else {
-                            modId = parentModelPathParts[0];
+                            parentModId = parentModelPathParts[0];
                             parentModelId = parentModelPathParts[1];
                         }
 
                         // TODO: Make a better support for overriden parents
-                        AssetPathResolver.AssetPaths parentModelPaths = AssetPathResolver.getModelPaths(modId, parentModelId);
-                        for (String parentJarPath : parentModelPaths.jarPaths) {
-                            Map<String, String> parentTexturePaths = extractTexturePathsFromModel(parentJarPath, parentModelPaths.assetPath);
-//                            texturePaths.putAll(parentTexturePaths);
-                            for (Map.Entry<String, String> parentTexturePath : parentTexturePaths.entrySet()) {
-                                if (parentTexturePath.getValue().startsWith("#")) continue;
-                                texturePaths.put(parentTexturePath.getKey(), parentTexturePath.getValue());
+                        AssetPathResolver.AssetPaths parentModelPaths = AssetPathResolver.getModelPaths(parentModId, parentModelId);
+                        if (parentModelPaths == null || parentModelPaths.jarPaths == null || parentModelPaths.jarPaths.isEmpty() || parentModelPaths.assetPath == null || parentModelPaths.assetPath.isEmpty()) {
+                            LOGGER.error("Failed to get parent model paths for model `{}` from mod `{}`", parentModelId, parentModId);
+                        } else {
+                            for (String parentJarPath : parentModelPaths.jarPaths) {
+//                                LOGGER.info("Extracting texture paths from parent model: {}; From mod: {}; In Jar: {}", parentModelPaths.assetPath, parentModId, parentJarPath);
+                                Map<String, String> parentTexturePaths = extractTexturePathsFromModel(parentJarPath, parentModelPaths.assetPath);
+//                                texturePaths.putAll(parentTexturePaths);
+                                for (Map.Entry<String, String> parentTexturePath : parentTexturePaths.entrySet()) {
+                                    if (parentTexturePath.getValue().startsWith("#")) continue;
+                                    texturePaths.put(parentTexturePath.getKey(), parentTexturePath.getValue());
+                                }
                             }
+//                            texturePaths = (extractTexturePathsFromModel(jarPath, parentModelPaths));
                         }
-//                        texturePaths = (extractTexturePathsFromModel(jarPath, parentModelPaths));
                     }
 
                     if (modelJson.has("textures")) {

@@ -100,10 +100,10 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 											}
 											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
 											if (colorReturn != null) {
+												colorReturn.color_avg.multiply(255);
+												colorReturn.color_avg.round();
 												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: {}", blockEntry.getKey(), requiredPropertySets, colorReturn.color_avg);
-											} else {
-												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: null", blockEntry.getKey(), requiredPropertySets);
-											}
+											} else LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: null", blockEntry.getKey(), requiredPropertySets);
 										}
 									}
 									context.getSource().sendFeedback(Text.of("Done"));
@@ -132,8 +132,10 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 										for (String blockstate : entry.getValue()) {
 											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(entry.getKey(), blockstate, null, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
 											if (colorReturn != null) {
+												colorReturn.color_avg.multiply(255);
+												colorReturn.color_avg.round();
 												LOGGER.info("  - blockstate: {}; color: {}", blockstate, colorReturn.color_avg);
-											}
+											} else LOGGER.info("  - blockstate: {}; color: null", blockstate);
 										}
 									}
 

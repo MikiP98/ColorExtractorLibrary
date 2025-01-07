@@ -147,14 +147,20 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                                 }
                             }
 
+                            // TODO: Make the properties value pairs case insensitive from the very beginning
                             // Check if keyParts contains at least 1 full set of required properties
                             // or true if requiredPropertySets is empty
                             boolean containsRequiredProperties = requiredPropertySets.isEmpty();
                             for (Map<String, Comparable> requiredPropertySet : requiredPropertySets) {
                                 boolean containsAllRequiredProperties = true;
                                 for (Map.Entry<String, Comparable> keyPart : requiredPropertySet.entrySet()) {
-                                    if (keyPartsKeyValuePairs.containsKey(keyPart.getKey())) {
-                                        if (!keyPart.getValue().toString().equals(keyPartsKeyValuePairs.get(keyPart.getKey()))) {
+                                    if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().toLowerCase())) {
+                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().toLowerCase()))) {
+                                            containsAllRequiredProperties = false;
+                                            break;
+                                        }
+                                    }  if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().toUpperCase())) {
+                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().toUpperCase()))) {
                                             containsAllRequiredProperties = false;
                                             break;
                                         }

@@ -122,6 +122,8 @@ public class TextureColorExtractor extends BaseColorExtractor {
                     for (int y = 0; y < image.getHeight(); y++) {
                         ColorRGBA pixelColor = pixel2Color(image.getRGB(x, y));
                         if (pixelColor.a == 0) continue;
+                        pixelColor.divide(255);
+
                         color_sum.add(pixelColor);
                         weight += 1;
                     }
@@ -136,6 +138,8 @@ public class TextureColorExtractor extends BaseColorExtractor {
                     for (int y = 0; y < image.getHeight(); y++) {
                         ColorRGBA pixelColor = pixel2Color(image.getRGB(x, y));
                         if (pixelColor.a == 0) continue;
+                        pixelColor.divide(255);
+
                         avg_color.multiply(pixelColor);
                         color_sum.add(pixelColor);
                         weight += 1;
@@ -171,8 +175,8 @@ public class TextureColorExtractor extends BaseColorExtractor {
                                 normalizedPixelColor.a
                         );
 
-                        pixelColor.multiply(weight_factor);
-                        color_sum.add(pixelColor);
+                        normalizedPixelColor.multiply(weight_factor);
+                        color_sum.add(normalizedPixelColor);
                         weight += weight_factor;
                     }
                 }
