@@ -148,7 +148,7 @@ public class AssetPathResolver {
                         for (Map.Entry<String, List<String>> entryMap : entryType.getValue().entrySet()) {
 
                             if (entryTypes.get(entryMap.getKey()) == null) {
-                                LOGGER.error("Corrupted path cache: {}; Replacing with empty map", entryMap.getKey());
+                                LOGGER.error("Corrupted path cache: {}; From mod: {}; Replacing with empty map", entryMap.getKey(), modId);
                                 entryTypes.put(entryMap.getKey(), new HashMap<>());
                             }
 

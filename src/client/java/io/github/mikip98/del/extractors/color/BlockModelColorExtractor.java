@@ -52,8 +52,10 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
 
             int totalTexturePathCount = 0;
             String assetPath = modelPaths.assetPath;
-            for (String jarPath :modelPaths.jarPaths) {
-                List<String> texturePaths = extractTexturePathsFromModel(jarPath, assetPath);
+            for (String jarPath : modelPaths.jarPaths) {
+                Collection<String> texturePaths = extractTexturePathsFromModel(jarPath, assetPath).values();
+//                LOGGER.info("Texture paths: {}", texturePaths);
+
                 if (!texturePaths.isEmpty()) {
                     for (String texturePath : texturePaths) {
                         String textureModId;
@@ -93,10 +95,10 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
         return colorReturn;
     }
 
-    public static @NotNull List<String> extractTexturePathsFromModel(String jarPath, String modelPath) {
+    public static @NotNull Map<String, String> extractTexturePathsFromModel(String jarPath, String modelPath) {
 //        LOGGER.info("Extracting texture paths from model: {}", modelPath);
 //        LOGGER.info("In jar: {}", jarPath);
-        List<String> texturePaths = new ArrayList<>();
+        Map<String, String> texturePaths = new HashMap<>();
 
         // Create a Gson instance
         Gson gson = new Gson();
@@ -111,10 +113,35 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                 try (InputStream inputStream = zipFile.getInputStream(entry); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
                     JsonObject modelJson = gson.fromJson(reader, JsonObject.class);  // Or use your specific class
-//                    LOGGER.info("Blockstate JSON: {}", modelJson);
+//                    LOGGER.info("Block model JSON: {}", modelJson);
 
-                    if (modelJson.keySet().contains("textures")) {
+                    if (modelJson.has("parent")) {
+                        String[] parentModelPathParts = modelJson.get("parent").getAsString().split(":", 2);
+                        String modId;
+                        String parentModelId;
 
+                        if (parentModelPathParts.length == 1) {
+                            modId = "minecraft";
+                            parentModelId = parentModelPathParts[0];
+                        } else {
+                            modId = parentModelPathParts[0];
+                            parentModelId = parentModelPathParts[1];
+                        }
+
+                        // TODO: Make a better support for overriden parents
+                        AssetPathResolver.AssetPaths parentModelPaths = AssetPathResolver.getModelPaths(modId, parentModelId);
+                        for (String parentJarPath : parentModelPaths.jarPaths) {
+                            Map<String, String> parentTexturePaths = extractTexturePathsFromModel(parentJarPath, parentModelPaths.assetPath);
+//                            texturePaths.putAll(parentTexturePaths);
+                            for (Map.Entry<String, String> parentTexturePath : parentTexturePaths.entrySet()) {
+                                if (parentTexturePath.getValue().startsWith("#")) continue;
+                                texturePaths.put(parentTexturePath.getKey(), parentTexturePath.getValue());
+                            }
+                        }
+//                        texturePaths = (extractTexturePathsFromModel(jarPath, parentModelPaths));
+                    }
+
+                    if (modelJson.has("textures")) {
                         JsonObject textures = (JsonObject) modelJson.get("textures");
 //                        Set<String> textureKeys = textures.keySet();
 //                        LOGGER.info("Textures: " + textures.entrySet());
@@ -123,16 +150,16 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                         // TODO: Add textures from parent models support
 
                         for (Map.Entry<String, JsonElement> textureEntry : textures.entrySet()) {
-                            texturePaths.add(textureEntry.getValue().getAsString());
+                            texturePaths.put(textureEntry.getKey(), textureEntry.getValue().getAsString());
                         }
-                    } else {
-                        LOGGER.error("Model JSON '{}' in mod file '{}' does not contain 'textures'!\nCEL currently does not support models inheriting textures from parent model.", modelPath, jarPath);
-                    }
+                    }/* else {
+                        LOGGER.error("Model JSON '{}' in mod file '{}' does not contain 'textures'!", modelPath, jarPath);
+                    }*/
                 } catch (IOException e) {
                     LOGGER.error("Failed to read JSON file: {};\nException: {};\nStacktrace: {}", modelPath, e.getMessage(), e.getStackTrace());
                 }
             } else {
-                LOGGER.error("JSON file not found in the JAR/ZIP archive.");
+                LOGGER.error("Model JSON file '{}' not found in the JAR/ZIP archive.", modelPath);
             }
 
         } catch (IOException e) {
