@@ -1,6 +1,7 @@
 package io.github.mikip98.del.api;
 
 import io.github.mikip98.del.extractors.LightBlocksExtractor;
+import io.github.mikip98.del.extractors.NonFullBlocksExtractor;
 import io.github.mikip98.del.extractors.TranslucentBlocksExtractor;
 
 import java.util.List;
@@ -30,7 +31,12 @@ public class BlockstatesAPI {
         return TranslucentBlocksExtractor.getTranslucentBlocks();
     }
 
-
+    /**
+     * @return Sorted, nested map of this format: modIds -> blockstateIds -> volume of the voxel shape
+     */
+    public static Map<String, Map<String, Double>> getNonFullBlocks() {
+        return NonFullBlocksExtractor.getNonFullBlocks();
+    }
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------

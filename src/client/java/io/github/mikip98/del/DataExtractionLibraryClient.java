@@ -1,5 +1,6 @@
 package io.github.mikip98.del;
 
+import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.assetloading.AssetPathResolver;
 import io.github.mikip98.del.enums.AVGTypes;
 import io.github.mikip98.del.extractors.*;
@@ -136,6 +137,20 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 												colorReturn.color_avg.round();
 												LOGGER.info("  - blockstate: {}; color: {}", blockstate, colorReturn.color_avg);
 											} else LOGGER.info("  - blockstate: {}; color: null", blockstate);
+										}
+									}
+
+									context.getSource().sendFeedback(Text.of("Done"));
+									return 0;
+								}))
+								.then(literal("log_non_full_blocks").executes(context -> {
+									Map<String, Map<String, Double>> nonFullBlocks = BlockstatesAPI.getNonFullBlocks();
+
+									LOGGER.info("Non full blocks:");
+									for (Map.Entry<String, Map<String, Double>> entry : nonFullBlocks.entrySet()) {
+										LOGGER.info("- mod: {}", entry.getKey());
+										for (Map.Entry<String, Double> entry2 : entry.getValue().entrySet()) {
+											LOGGER.info("  - blockstate: {}; volume: {}", entry2.getKey(), entry2.getValue());
 										}
 									}
 
