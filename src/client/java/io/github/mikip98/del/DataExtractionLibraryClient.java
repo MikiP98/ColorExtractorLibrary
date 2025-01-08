@@ -3,7 +3,6 @@ package io.github.mikip98.del;
 import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.assetloading.AssetPathResolver;
 import io.github.mikip98.del.enums.AVGTypes;
-import io.github.mikip98.del.extractors.*;
 import io.github.mikip98.del.extractors.color.BlockModelColorExtractor;
 import io.github.mikip98.del.extractors.color.BlockstateColorExtractor;
 import io.github.mikip98.del.extractors.color.TextureColorExtractor;
@@ -62,7 +61,7 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 						)
 						.then(literal("debug")
 								.then(literal("log_light_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = LightBlocksExtractor.getLightEmittingBlocksData();
+									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
 									LOGGER.info("Light emitting blocks:");
 									LOGGER.info("Mod count: {}", lightEmittingBlocks.size());
 									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
@@ -84,7 +83,7 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_avg_colors_for_light_emitting_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = LightBlocksExtractor.getLightEmittingBlocksData();
+									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
 									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										String modId = entry.getKey();
 										LOGGER.info("- Mod: {}", modId);
@@ -111,7 +110,7 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_translucent_blocks").executes(context -> {
-									Map<String, List<String>> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
+									Map<String, List<String>> translucentBlocks = BlockstatesAPI.getTranslucentBlockNames();
 
 									LOGGER.info("Translucent blocks:");
 									for (Map.Entry<String, List<String>> entry : translucentBlocks.entrySet()) {
@@ -125,7 +124,7 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_avg_colors_for_translucent_blocks").executes(context -> {
-									Map<String, List<String>> translucentBlocks = TranslucentBlocksExtractor.getTranslucentBlocks();
+									Map<String, List<String>> translucentBlocks = BlockstatesAPI.getTranslucentBlockNames();
 
 									LOGGER.info("Translucent blocks:");
 									for (Map.Entry<String, List<String>> entry : translucentBlocks.entrySet()) {
