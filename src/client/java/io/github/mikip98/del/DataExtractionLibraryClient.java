@@ -7,6 +7,7 @@ import io.github.mikip98.del.extractors.color.BlockModelColorExtractor;
 import io.github.mikip98.del.extractors.color.BlockstateColorExtractor;
 import io.github.mikip98.del.extractors.color.TextureColorExtractor;
 import io.github.mikip98.del.structures.ColorReturn;
+import io.github.mikip98.del.structures.SimplifiedProperty;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.text.Text;
@@ -61,19 +62,19 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 						)
 						.then(literal("debug")
 								.then(literal("log_light_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
+									Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
 									LOGGER.info("Light emitting blocks:");
 									LOGGER.info("Mod count: {}", lightEmittingBlocks.size());
-									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
+									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										LOGGER.info("Mod: {}; With {} light emitting blocks:", entry.getKey(), entry.getValue().size());
-										for (Map.Entry<String, Map<Byte, Set<Map<String, Comparable>>>> entry2 : entry.getValue().entrySet()) {
+										for (Map.Entry<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> entry2 : entry.getValue().entrySet()) {
 											LOGGER.info("  - Blockstate: {}; With {} light levels:", entry2.getKey(), entry2.getValue().size());
-											for (Map.Entry<Byte, Set<Map<String, Comparable>>> entry3 : entry2.getValue().entrySet()) {
+											for (Map.Entry<Byte, Set<Map<SimplifiedProperty, Comparable>>> entry3 : entry2.getValue().entrySet()) {
 												LOGGER.info("    - Light level: {}; With {} property sets:", entry3.getKey(), entry3.getValue().size());
-												for (Map<String, Comparable> propertySet : entry3.getValue()) {
+												for (Map<SimplifiedProperty, Comparable> propertySet : entry3.getValue()) {
 													LOGGER.info("      - Property count: {}", propertySet.size());
-													for (Map.Entry<String, Comparable> propertyValuePair : propertySet.entrySet()) {
-														LOGGER.info("        - {}={}", propertyValuePair.getKey(), propertyValuePair.getValue());
+													for (Map.Entry<SimplifiedProperty, Comparable> propertyValuePair : propertySet.entrySet()) {
+														LOGGER.info("        - {}={}", propertyValuePair.getKey().name, propertyValuePair.getValue());
 													}
 												}
 											}
@@ -83,17 +84,17 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_avg_colors_for_light_emitting_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
-									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
+									Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
+									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										String modId = entry.getKey();
 										LOGGER.info("- Mod: {}", modId);
 
-										Map<String, Map<Byte, Set<Map<String, Comparable>>>> blockIds = entry.getValue();
-										for (Map.Entry<String, Map<Byte, Set<Map<String, Comparable>>>> blockEntry : blockIds.entrySet()) {
-											List<Map<String, Comparable>> requiredPropertySets = new ArrayList<>();
-											for (Map.Entry<Byte, Set<Map<String, Comparable>>> lightLevelEntry : blockEntry.getValue().entrySet()) {
-												Map<String, Comparable> requiredPropertySet = new HashMap<>();
-												for (Map<String, Comparable> propertySet : lightLevelEntry.getValue()) {
+										Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockIds = entry.getValue();
+										for (Map.Entry<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockEntry : blockIds.entrySet()) {
+											List<Map<SimplifiedProperty, Comparable>> requiredPropertySets = new ArrayList<>();
+											for (Map.Entry<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightLevelEntry : blockEntry.getValue().entrySet()) {
+												Map<SimplifiedProperty, Comparable> requiredPropertySet = new HashMap<>();
+												for (Map<SimplifiedProperty, Comparable> propertySet : lightLevelEntry.getValue()) {
 													requiredPropertySet.putAll(propertySet);
 												}
 												requiredPropertySets.add(requiredPropertySet);

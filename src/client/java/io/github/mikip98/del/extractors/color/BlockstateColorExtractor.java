@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import io.github.mikip98.del.assetloading.AssetPathResolver;
 import io.github.mikip98.del.enums.AVGTypes;
 import io.github.mikip98.del.structures.ColorReturn;
+import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.del.util.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
 
 
     @SuppressWarnings("rawtypes")
-    public static ColorReturn getAverageBlockstateColor(String modId, String blockstateId, List<Map<String, Comparable>> requiredPropertySets, float weightedness, AVGTypes avgType) {
+    public static ColorReturn getAverageBlockstateColor(String modId, String blockstateId, List<Map<SimplifiedProperty, Comparable>> requiredPropertySets, float weightedness, AVGTypes avgType) {
         String cacheKey = modId + "_" + blockstateId;
 
         // Check the cache first
@@ -95,7 +96,7 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
     }
 
     @SuppressWarnings("rawtypes")
-    public static @NotNull List<String> extractModelPathsFromBlockstate(String jarPath, String blockstatePath, List<Map<String, Comparable>> requiredPropertySets) {
+    public static @NotNull List<String> extractModelPathsFromBlockstate(String jarPath, String blockstatePath, List<Map<SimplifiedProperty, Comparable>> requiredPropertySets) {
         if (requiredPropertySets == null) {
             requiredPropertySets = new ArrayList<>();
         }
@@ -151,16 +152,16 @@ public class BlockstateColorExtractor extends BaseColorExtractor {
                             // Check if keyParts contains at least 1 full set of required properties
                             // or true if requiredPropertySets is empty
                             boolean containsRequiredProperties = requiredPropertySets.isEmpty();
-                            for (Map<String, Comparable> requiredPropertySet : requiredPropertySets) {
+                            for (Map<SimplifiedProperty, Comparable> requiredPropertySet : requiredPropertySets) {
                                 boolean containsAllRequiredProperties = true;
-                                for (Map.Entry<String, Comparable> keyPart : requiredPropertySet.entrySet()) {
-                                    if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().toLowerCase())) {
-                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().toLowerCase()))) {
+                                for (Map.Entry<SimplifiedProperty, Comparable> keyPart : requiredPropertySet.entrySet()) {
+                                    if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().name.toLowerCase())) {
+                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().name))) {
                                             containsAllRequiredProperties = false;
                                             break;
                                         }
-                                    }  if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().toUpperCase())) {
-                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().toUpperCase()))) {
+                                    } else if (keyPartsKeyValuePairs.containsKey(keyPart.getKey().name.toUpperCase())) {
+                                        if (!keyPart.getValue().toString().equalsIgnoreCase(keyPartsKeyValuePairs.get(keyPart.getKey().name))) {
                                             containsAllRequiredProperties = false;
                                             break;
                                         }

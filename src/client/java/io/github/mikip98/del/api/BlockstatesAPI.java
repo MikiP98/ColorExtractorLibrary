@@ -3,6 +3,7 @@ package io.github.mikip98.del.api;
 import io.github.mikip98.del.extractors.LightBlocksExtractor;
 import io.github.mikip98.del.extractors.NonFullBlocksExtractor;
 import io.github.mikip98.del.extractors.TranslucentBlocksExtractor;
+import io.github.mikip98.del.structures.SimplifiedProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class BlockstatesAPI {
      * @return Sorted, nested map of this format: modIds -> blockstateIds -> light levels -> property value pairs
      */
     @SuppressWarnings("rawtypes")
-    public static Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> getLightEmittingBlocksData() {
+    public static Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
         return LightBlocksExtractor.getLightEmittingBlocksData();
     }
 

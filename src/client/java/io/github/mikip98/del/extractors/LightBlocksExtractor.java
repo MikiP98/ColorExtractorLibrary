@@ -1,5 +1,6 @@
 package io.github.mikip98.del.extractors;
 
+import io.github.mikip98.del.structures.SimplifiedProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
@@ -9,9 +10,9 @@ import java.util.*;
 
 public class LightBlocksExtractor {
     @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
-    public static Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> getLightEmittingBlocksData() {
+    public static Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
         // modId -> blockIds -> light levels -> property value pairs
-        Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
+        Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
 
         for (Block block : Registries.BLOCK) {
             Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties = new HashMap<>();
@@ -51,15 +52,18 @@ public class LightBlocksExtractor {
                 lightEmittingProperties = compressLightEmittingProperties(lightEmittingProperties);
 
                 // Replace Property with its name
-                Map<Byte, Set<Map<String, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
+                Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
                 for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
                     lightEmittingPropertiesNamed.put(entry.getKey(), new HashSet<>());
                     for (Map<Property, Comparable> propertyValuePairs : entry.getValue()) {
-                        Map<String, Comparable> propertyValuePairsNamed = new HashMap<>();
+                        Map<SimplifiedProperty, Comparable> propertyValuePairsNamed = new HashMap<>();
                         for (Map.Entry<Property, Comparable> entry2 : propertyValuePairs.entrySet()) {
                             Property property = entry2.getKey();
                             Comparable value = entry2.getValue();
-                            propertyValuePairsNamed.put(property.getName(), value);
+                            propertyValuePairsNamed.put(
+                                    new SimplifiedProperty(property.getName(), new HashSet<Comparable>(property.getValues())),
+                                    value
+                            );
                         }
                         lightEmittingPropertiesNamed.get(entry.getKey()).add(propertyValuePairsNamed);
                     }
