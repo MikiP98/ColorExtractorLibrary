@@ -1,5 +1,6 @@
 package io.github.mikip98.del.extractors;
 
+import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -10,9 +11,9 @@ import java.util.*;
 
 public class LightBlocksExtractor {
     @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
-    public static Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
+    public static Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
         // modId -> blockIds -> light levels -> property value pairs
-        Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
+        Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
 
         for (Block block : Registries.BLOCK) {
             Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties = new HashMap<>();
@@ -74,7 +75,10 @@ public class LightBlocksExtractor {
                 String blockstateId = parts[2];
 
                 lightEmittingBlocks.putIfAbsent(modId, new HashMap<>());
-                lightEmittingBlocks.get(modId).put(blockstateId, lightEmittingPropertiesNamed);
+                lightEmittingBlocks.get(modId).put(
+                        new BlockstateWrapper(blockstateId, (byte) block.getDefaultState().getLuminance()),
+                        lightEmittingPropertiesNamed
+                );
             }
         }
 

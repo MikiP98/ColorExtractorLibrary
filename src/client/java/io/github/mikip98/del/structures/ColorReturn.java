@@ -17,10 +17,11 @@ public class ColorReturn {
         this.weight_sum = 0;
     }
 
-    public void add(ColorReturn other) {
+    public ColorReturn add(ColorReturn other) {
         this.color_avg.add(other.color_avg);
         this.color_sum.add(other.color_sum);
         this.weight_sum += other.weight_sum;
+        return this;
     }
 
 

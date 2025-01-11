@@ -30,53 +30,63 @@ public class ColorRGBA {
     }
 
 
-    public void add(ColorRGBA other) {
+    public ColorRGBA add(ColorRGBA other) {
         this.r += other.r;
         this.g += other.g;
         this.b += other.b;
         this.a += other.a;
+        return this;
     }
 
-    public void multiply(ColorRGBA other) {
+    @SuppressWarnings("UnusedReturnValue")
+    public ColorRGBA multiply(ColorRGBA other) {
         this.r *= other.r;
         this.g *= other.g;
         this.b *= other.b;
         this.a *= other.a;
+        return this;
     }
-    public void multiply(double n) {
+    public ColorRGBA multiply(double n) {
         this.r *= n;
         this.g *= n;
         this.b *= n;
         this.a *= n;
+        return this;
     }
 
-    public void divide(double n) {
-//        if (n == 0) throw new RuntimeException("Division by zero");
+    @SuppressWarnings("UnusedReturnValue")
+    public ColorRGBA divide(double n) {
         this.r /= n;
         this.g /= n;
         this.b /= n;
         this.a /= n;
+        return this;
     }
-    public void divide(int n) {
-//        if (n == 0) throw new RuntimeException("Division by zero");
+    @SuppressWarnings("UnusedReturnValue")
+    public ColorRGBA divide(int n) {
         this.r /= n;
         this.g /= n;
         this.b /= n;
         this.a /= n;
+        return this;
     }
 
-    public void root(double n) {
+    @SuppressWarnings("UnusedReturnValue")
+    public ColorRGBA root(double n) {
         this.r = Math.pow(this.r, 1 / n);
         this.g = Math.pow(this.g, 1 / n);
         this.b = Math.pow(this.b, 1 / n);
         this.a = Math.pow(this.a, 1 / n);
+        return this;
     }
 
-    public void round() {
+    @SuppressWarnings("UnusedReturnValue")
+    public ColorRGBA round() {
         this.r = Math.round(this.r);
         this.g = Math.round(this.g);
         this.b = Math.round(this.b);
         this.a = Math.round(this.a);
+        return this;
     }
 
 

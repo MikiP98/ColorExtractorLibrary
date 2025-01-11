@@ -6,6 +6,7 @@ import io.github.mikip98.del.enums.AVGTypes;
 import io.github.mikip98.del.extractors.color.BlockModelColorExtractor;
 import io.github.mikip98.del.extractors.color.BlockstateColorExtractor;
 import io.github.mikip98.del.extractors.color.TextureColorExtractor;
+import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import net.fabricmc.api.ClientModInitializer;
@@ -62,13 +63,13 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 						)
 						.then(literal("debug")
 								.then(literal("log_light_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
+									Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
 									LOGGER.info("Light emitting blocks:");
 									LOGGER.info("Mod count: {}", lightEmittingBlocks.size());
-									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
+									for (Map.Entry<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										LOGGER.info("Mod: {}; With {} light emitting blocks:", entry.getKey(), entry.getValue().size());
-										for (Map.Entry<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> entry2 : entry.getValue().entrySet()) {
-											LOGGER.info("  - Blockstate: {}; With {} light levels:", entry2.getKey(), entry2.getValue().size());
+										for (Map.Entry<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> entry2 : entry.getValue().entrySet()) {
+											LOGGER.info("  - Blockstate: {}; With {} light levels; Default emission: '{}'; Details :", entry2.getKey().blockstateId, entry2.getValue().size(), entry2.getKey().defaultEmission);
 											for (Map.Entry<Byte, Set<Map<SimplifiedProperty, Comparable>>> entry3 : entry2.getValue().entrySet()) {
 												LOGGER.info("    - Light level: {}; With {} property sets:", entry3.getKey(), entry3.getValue().size());
 												for (Map<SimplifiedProperty, Comparable> propertySet : entry3.getValue()) {
@@ -84,13 +85,13 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_avg_colors_for_light_emitting_blocks").executes(context -> {
-									Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
-									for (Map.Entry<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
+									Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
+									for (Map.Entry<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> entry : lightEmittingBlocks.entrySet()) {
 										String modId = entry.getKey();
 										LOGGER.info("- Mod: {}", modId);
 
-										Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockIds = entry.getValue();
-										for (Map.Entry<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockEntry : blockIds.entrySet()) {
+										Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockIds = entry.getValue();
+										for (Map.Entry<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blockEntry : blockIds.entrySet()) {
 											List<Map<SimplifiedProperty, Comparable>> requiredPropertySets = new ArrayList<>();
 											for (Map.Entry<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightLevelEntry : blockEntry.getValue().entrySet()) {
 												Map<SimplifiedProperty, Comparable> requiredPropertySet = new HashMap<>();
@@ -99,12 +100,11 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 												}
 												requiredPropertySets.add(requiredPropertySet);
 											}
-											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey(), requiredPropertySets, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
+											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(modId, blockEntry.getKey().blockstateId, requiredPropertySets, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
 											if (colorReturn != null) {
-												colorReturn.color_avg.multiply(255);
-												colorReturn.color_avg.round();
-												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: {}", blockEntry.getKey(), requiredPropertySets, colorReturn.color_avg);
-											} else LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: null", blockEntry.getKey(), requiredPropertySets);
+												colorReturn.color_avg.multiply(255).round();
+												LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: {}", blockEntry.getKey().blockstateId, requiredPropertySets, colorReturn.color_avg);
+											} else LOGGER.info("  - Blockstate: {}; Required properties: {}; Color: null", blockEntry.getKey().blockstateId, requiredPropertySets);
 										}
 									}
 									context.getSource().sendFeedback(Text.of("Done"));
@@ -133,8 +133,7 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 										for (String blockstate : entry.getValue()) {
 											ColorReturn colorReturn = BlockstateColorExtractor.getAverageBlockstateColor(entry.getKey(), blockstate, null, 0.8f, AVGTypes.WEIGHTED_ARITHMETIC);
 											if (colorReturn != null) {
-												colorReturn.color_avg.multiply(255);
-												colorReturn.color_avg.round();
+												colorReturn.color_avg.multiply(255).round();
 												LOGGER.info("  - blockstate: {}; color: {}", blockstate, colorReturn.color_avg);
 											} else LOGGER.info("  - blockstate: {}; color: null", blockstate);
 										}
