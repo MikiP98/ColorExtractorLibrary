@@ -37,9 +37,10 @@ public class AssetPathResolver {
         // Go through every `.jar` and `.zip` file in the `mods` directory
         try (Stream<Path> paths = Files.list(modsFolder)) {
             paths.filter(file -> file.toString().endsWith(".jar") || file.toString().endsWith(".zip")).forEach(modPath -> {
-                if (modPath.toString().endsWith(".jar") || modPath.toString().endsWith(".zip")) {
-                    handleZipOrJar(modPath.toFile(), cachedAssetTypes, newAssetPaths);
-                }
+                handleZipOrJar(modPath.toFile(), cachedAssetTypes, newAssetPaths);
+//                if (modPath.toString().endsWith(".jar") || modPath.toString().endsWith(".zip")) {
+//                    handleZipOrJar(modPath.toFile(), cachedAssetTypes, newAssetPaths);
+//                }
             });
         } catch (IOException e) {
             // LOG the error
