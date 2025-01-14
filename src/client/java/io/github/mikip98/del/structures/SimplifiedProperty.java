@@ -12,4 +12,9 @@ public class SimplifiedProperty {
         this.name = name;
         this.allowedValues = allowedValues;
     }
+
+    @Override
+    public String toString() {
+        return "SimplifiedProperty{" + "name='" + name + '\'' + ", allowedValues=" + allowedValues + '}';
+    }
 }
