@@ -155,6 +155,7 @@ public class BlockModelColorExtractor extends BaseColorExtractor {
                         // TODO: Add textures from parent models support
 
                         for (Map.Entry<String, JsonElement> textureEntry : textures.entrySet()) {
+                            if (textureEntry.getValue().getAsString().startsWith("#")) continue;
                             texturePaths.put(textureEntry.getKey(), textureEntry.getValue().getAsString());
                         }
                     }/* else {
