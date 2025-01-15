@@ -6,12 +6,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class LightBlocksExtractor {
-    @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
-    public static Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
+    @SuppressWarnings({"deprecation", "rawtypes", "unchecked", "UnusedReturnValue"})
+    public static @NotNull Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
         // modId -> blockIds -> light levels -> property value pairs
         Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
 
@@ -76,7 +77,13 @@ public class LightBlocksExtractor {
 
                 lightEmittingBlocks.putIfAbsent(modId, new HashMap<>());
                 lightEmittingBlocks.get(modId).put(
-                        new BlockstateWrapper(blockstateId, (byte) block.getDefaultState().getLuminance()),
+                        new BlockstateWrapper(
+                                blockstateId,
+                                (byte) block.getDefaultState().getLuminance(),
+                                VolumeExtractor.getVoxelShapeVolume(
+                                        block.getCollisionShape(block.getDefaultState(), null, null, null)
+                                )
+                        ),
                         lightEmittingPropertiesNamed
                 );
             }
@@ -86,7 +93,7 @@ public class LightBlocksExtractor {
     }
 
     @SuppressWarnings("rawtypes")
-    public static Map<Byte, Set<Map<Property, Comparable>>> compressLightEmittingProperties(Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties) {
+    public static @NotNull Map<Byte, Set<Map<Property, Comparable>>> compressLightEmittingProperties(Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties) {
         Map<Byte, Set<Map<Property, Comparable>>> compressedLightEmittingProperties = new HashMap<>();
 
         for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
@@ -125,7 +132,7 @@ public class LightBlocksExtractor {
 
 
 
-    private static List<Map<Property<?>, Comparable<?>>> generateCombinations(Collection<Property<?>> properties) {
+    private static @NotNull List<Map<Property<?>, Comparable<?>>> generateCombinations(Collection<Property<?>> properties) {
         List<Map<Property<?>, Comparable<?>>> result = new ArrayList<>();
         generateCombinationsRecursive(new ArrayList<>(properties), new HashMap<>(), result, 0);
         return result;
