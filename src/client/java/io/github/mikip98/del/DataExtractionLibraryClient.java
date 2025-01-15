@@ -9,6 +9,7 @@ import io.github.mikip98.del.extractors.color.TextureColorExtractor;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
+import io.github.mikip98.del.structures.VolumeData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.text.Text;
@@ -143,10 +144,10 @@ public class DataExtractionLibraryClient implements ClientModInitializer {
 									return 0;
 								}))
 								.then(literal("log_non_full_blocks").executes(context -> {
-									Map<String, Map<String, Double>> nonFullBlocks = BlockstatesAPI.getNonFullBlocks();
+									VolumeData nonFullBlocks = BlockstatesAPI.getNonFullBlocks();
 
 									LOGGER.info("Non full blocks:");
-									for (Map.Entry<String, Map<String, Double>> entry : nonFullBlocks.entrySet()) {
+									for (Map.Entry<String, Map<String, Double>> entry : nonFullBlocks.knownNonFullBlocksData.entrySet()) {
 										LOGGER.info("- mod: {}", entry.getKey());
 										for (Map.Entry<String, Double> entry2 : entry.getValue().entrySet()) {
 											LOGGER.info("  - blockstate: {}; volume: {}", entry2.getKey(), entry2.getValue());
