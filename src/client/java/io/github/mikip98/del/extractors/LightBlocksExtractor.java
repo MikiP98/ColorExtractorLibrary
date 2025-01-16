@@ -80,9 +80,7 @@ public class LightBlocksExtractor {
                         new BlockstateWrapper(
                                 blockstateId,
                                 (byte) block.getDefaultState().getLuminance(),
-                                VolumeExtractor.getVoxelShapeVolume(
-                                        block.getCollisionShape(block.getDefaultState(), null, null, null)
-                                )
+                                VolumeExtractor.getVoxelShapeVolume(block.getDefaultState())
                         ),
                         lightEmittingPropertiesNamed
                 );
