@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class LightBlocksExtractor {
-    @SuppressWarnings({"deprecation", "rawtypes", "unchecked", "UnusedReturnValue"})
+    @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
     public static @NotNull Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
         // modId -> blockIds -> light levels -> property value pairs
         Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocks = new HashMap<>();
@@ -62,8 +62,13 @@ public class LightBlocksExtractor {
                         for (Map.Entry<Property, Comparable> entry2 : propertyValuePairs.entrySet()) {
                             Property property = entry2.getKey();
                             Comparable value = entry2.getValue();
+
                             propertyValuePairsNamed.put(
-                                    new SimplifiedProperty(property.getName(), new HashSet<Comparable>(property.getValues())),
+                                    new SimplifiedProperty(
+                                            property.getName(),
+                                            new HashSet<Comparable>(property.getValues()),
+                                            PropertyExtractor.getParserForComparable(value)
+                                    ),
                                     value
                             );
                         }

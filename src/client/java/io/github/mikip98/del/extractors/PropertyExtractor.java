@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.function.Function;
 
 public class PropertyExtractor {
 
@@ -28,7 +29,8 @@ public class PropertyExtractor {
                         propertyName2SimplifiedPropertyMap.put(
                             property.getName(), new SimplifiedProperty(
                                     property.getName(),
-                                    values
+                                    values,
+                                    getParserForComparable(values.iterator().next())
                             )
                         );
                     }
@@ -36,5 +38,18 @@ public class PropertyExtractor {
         }
 
         return propertyName2SimplifiedPropertyMap;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected static Function<String, Comparable> getParserForComparable(Comparable c) {
+        if (c instanceof Enum) return (String s) -> Enum.valueOf((Class) c.getClass(), s);
+
+        else if (c instanceof Boolean) return Boolean::parseBoolean;
+        else if (c instanceof Double) return Double::parseDouble;
+        else if (c instanceof Float) return Float::parseFloat;
+        else if (c instanceof Integer) return Integer::parseInt;
+        else if (c instanceof Long) return Long::parseLong;
+        else if (c instanceof String) return (String s) -> s;
+        else return null;
     }
 }
