@@ -23,16 +23,24 @@ public class PropertyExtractor {
 
                         if (
                                 propertyName2SimplifiedPropertyMap.containsKey(property.getName())
-                                && !propertyName2SimplifiedPropertyMap.get(property.getName()).allowedValues.equals(values)
-                        ) throw new RuntimeException("Duplicate property name: " + property.getName());
+                                        && !propertyName2SimplifiedPropertyMap.get(property.getName()).allowedValues.equals(values)
+                        ) {
+//                            throw new RuntimeException(
+//                                    "Duplicate property name: " + property.getName() + " with different values, original values: " +
+//                                            propertyName2SimplifiedPropertyMap.get(property.getName()).allowedValues + ", new values: " + values
+//                            );
+                            propertyName2SimplifiedPropertyMap.get(property.getName()).allowedValues.addAll(values);
+                            // TODO: Merge allowed values if possible (a.k.a. are of the same type), else ignore the new property :(
 
-                        propertyName2SimplifiedPropertyMap.put(
-                            property.getName(), new SimplifiedProperty(
-                                    property.getName(),
-                                    values,
-                                    getParserForComparable(values.iterator().next())
-                            )
-                        );
+                        } else {
+                            propertyName2SimplifiedPropertyMap.put(
+                                    property.getName(), new SimplifiedProperty(
+                                            property.getName(),
+                                            values,
+                                            getParserForComparable(values.iterator().next())
+                                    )
+                            );
+                        }
                     }
             );
         }

@@ -25,6 +25,7 @@ public class OtherAPI {
     }
 
     /**
+     * CAUTION: If 2 or more properties with the same name exist, the allowed values will be merged
      * @return Map of property names to simplified properties
      */
     public static Map<String, SimplifiedProperty> getPropertyName2SimplifiedPropertyMap() {
