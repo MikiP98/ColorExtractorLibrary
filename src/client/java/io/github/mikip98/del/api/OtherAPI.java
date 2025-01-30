@@ -2,7 +2,7 @@ package io.github.mikip98.del.api;
 
 import io.github.mikip98.del.extractors.PropertyExtractor;
 import io.github.mikip98.del.extractors.VolumeExtractor;
-import io.github.mikip98.del.structures.SimplifiedProperty;
+import io.github.mikip98.del.structures.EProperty;
 import net.minecraft.util.shape.VoxelShape;
 
 import java.util.Map;
@@ -25,11 +25,12 @@ public class OtherAPI {
     }
 
     /**
-     * CAUTION: If 2 or more properties with the same name exist, the allowed values will be merged
-     * @return Map of property names to simplified properties
+     * @return Map of property names to EProperties, being either Quantum or Simple properties.
+     *         If a given name has only one possible property it wil be a Simple property.
+     *         If a given name has multiple possible properties it will be a Quantum property
      */
-    public static Map<String, SimplifiedProperty> getPropertyName2SimplifiedPropertyMap() {
-        return PropertyExtractor.getPropertyName2SimplifiedPropertyMap();
+    public static Map<String, EProperty> getPropertyName2EPropertyMap() {
+        return PropertyExtractor.getPropertyName2EPropertyMap();
     }
 
     // ------------------------------------------------------------------------

@@ -63,14 +63,12 @@ public class LightBlocksExtractor {
                             Property property = entry2.getKey();
                             Comparable value = entry2.getValue();
 
-                            propertyValuePairsNamed.put(
-                                    new SimplifiedProperty(
-                                            property.getName(),
-                                            new HashSet<Comparable>(property.getValues()),
-                                            PropertyExtractor.getParserForComparable(value)
-                                    ),
-                                    value
+                            SimplifiedProperty simplifiedProperty = new SimplifiedProperty(
+                                    property.getName(),
+                                    new HashSet<Comparable>(property.getValues()),
+                                    PropertyExtractor.getParserForComparable(value)
                             );
+                            propertyValuePairsNamed.put(simplifiedProperty, value);
                         }
                         lightEmittingPropertiesNamed.get(entry.getKey()).add(propertyValuePairsNamed);
                     }
@@ -96,7 +94,7 @@ public class LightBlocksExtractor {
     }
 
     @SuppressWarnings("rawtypes")
-    public static @NotNull Map<Byte, Set<Map<Property, Comparable>>> compressLightEmittingProperties(Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties) {
+    protected static @NotNull Map<Byte, Set<Map<Property, Comparable>>> compressLightEmittingProperties(Map<Byte, Set<Map<Property, Comparable>>> lightEmittingProperties) {
         Map<Byte, Set<Map<Property, Comparable>>> compressedLightEmittingProperties = new HashMap<>();
 
         for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
