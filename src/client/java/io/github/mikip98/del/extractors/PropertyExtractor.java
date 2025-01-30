@@ -50,7 +50,9 @@ public class PropertyExtractor {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected static Function<String, Comparable> getParserForComparable(Comparable c) {
-        if (c instanceof Enum) return (String s) -> Enum.valueOf((Class) c.getClass(), s);
+
+
+        if (c instanceof Enum) return (String s) -> Enum.valueOf((Class) c.getClass(), s.toUpperCase());
 
         else if (c instanceof Boolean) return Boolean::parseBoolean;
         else if (c instanceof Double) return Double::parseDouble;
