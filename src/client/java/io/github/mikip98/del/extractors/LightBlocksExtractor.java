@@ -53,7 +53,7 @@ public class LightBlocksExtractor {
                 // Compress the propertySets
                 lightEmittingProperties = compressLightEmittingProperties(lightEmittingProperties);
 
-                // Replace Property with its name
+                // Replace Property with SimplifiedProperty
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
                 for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
                     lightEmittingPropertiesNamed.put(entry.getKey(), new HashSet<>());
