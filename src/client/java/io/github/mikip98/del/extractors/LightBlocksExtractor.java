@@ -56,8 +56,10 @@ public class LightBlocksExtractor {
                 // Replace Property with SimplifiedProperty
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
                 for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
-                    lightEmittingPropertiesNamed.put(entry.getKey(), new HashSet<>());
-                    for (Map<Property, Comparable> propertyValuePairs : entry.getValue()) {
+                    byte lightLevel = entry.getKey();
+                    Set<Map<Property, Comparable>> propertySets = entry.getValue();
+                    lightEmittingPropertiesNamed.put(lightLevel, new HashSet<>());
+                    for (Map<Property, Comparable> propertyValuePairs : propertySets) {
                         Map<SimplifiedProperty, Comparable> propertyValuePairsNamed = new HashMap<>();
                         for (Map.Entry<Property, Comparable> entry2 : propertyValuePairs.entrySet()) {
                             Property property = entry2.getKey();
@@ -70,7 +72,7 @@ public class LightBlocksExtractor {
                             );
                             propertyValuePairsNamed.put(simplifiedProperty, value);
                         }
-                        lightEmittingPropertiesNamed.get(entry.getKey()).add(propertyValuePairsNamed);
+                        lightEmittingPropertiesNamed.get(lightLevel).add(propertyValuePairsNamed);
                     }
                 }
 
