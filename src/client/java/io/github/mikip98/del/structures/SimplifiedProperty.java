@@ -31,4 +31,12 @@ public class SimplifiedProperty extends EProperty {
                 && this.allowedValues.equals(other.allowedValues)
                 && (this.converter == other.converter || (this.converter != null && this.converter.equals(other.converter)));  // Handle possible null
     }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + allowedValues.hashCode();
+        result = 31 * result + (converter != null ? converter.hashCode() : 0);
+        return result;
+    }
 }
