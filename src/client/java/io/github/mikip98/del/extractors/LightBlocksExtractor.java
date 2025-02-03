@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
+
 public class LightBlocksExtractor {
     @SuppressWarnings({"rawtypes", "unchecked", "UnusedReturnValue"})
     public static @NotNull Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> getLightEmittingBlocksData() {
@@ -52,6 +54,28 @@ public class LightBlocksExtractor {
 
                 // Compress the propertySets
                 lightEmittingProperties = compressLightEmittingProperties(lightEmittingProperties);
+
+                // Remove all empty propertySets
+                for (Set<Map<Property, Comparable>> propertySets : lightEmittingProperties.values()) {
+                    propertySets.removeIf(Map::isEmpty);
+                }
+
+                // Test is any of the propertySets is empty, if so, throw exception
+                for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry : lightEmittingProperties.entrySet()) {
+                    Set<Map<Property, Comparable>> propertySets = entry.getValue();
+                    for (Map<Property, Comparable> propertySet : propertySets) {
+                        if (propertySet.isEmpty()) {
+                            LOGGER.info("All property sets:");
+                            for (Map.Entry<Byte, Set<Map<Property, Comparable>>> entry2 : lightEmittingProperties.entrySet()) {
+                                byte lightLevel = entry2.getKey();
+                                Set<Map<Property, Comparable>> propertySets2 = entry2.getValue();
+                                LOGGER.info("  - Light level: {}; With {} property sets: {}", lightLevel, propertySets2.size(), propertySets2);
+                            }
+                            LOGGER.info("Active property sets: {}", propertySets);
+                            throw new RuntimeException("PropertySet is empty for: " + block.getTranslationKey());
+                        }
+                    }
+                }
 
                 // Replace Property with SimplifiedProperty
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> lightEmittingPropertiesNamed = new HashMap<>();
