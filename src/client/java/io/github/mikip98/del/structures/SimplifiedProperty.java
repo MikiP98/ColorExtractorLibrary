@@ -27,6 +27,8 @@ public class SimplifiedProperty extends EProperty {
         if (obj.getClass() != this.getClass()) return false;
 
         final SimplifiedProperty other = (SimplifiedProperty) obj;
-        return this.name.equals(other.name) && this.allowedValues == other.allowedValues && this.converter == other.converter;
+        return this.name.equals(other.name)
+                && this.allowedValues.equals(other.allowedValues)
+                && (this.converter == other.converter || (this.converter != null && this.converter.equals(other.converter)));  // Handle possible null
     }
 }
