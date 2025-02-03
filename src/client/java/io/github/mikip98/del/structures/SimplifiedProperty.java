@@ -20,4 +20,13 @@ public class SimplifiedProperty extends EProperty {
     public String toString() {
         return "SimplifiedProperty{" + "name='" + name + '\'' + ", allowedValues=" + allowedValues + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj.getClass() != this.getClass()) return false;
+
+        final SimplifiedProperty other = (SimplifiedProperty) obj;
+        return this.name.equals(other.name) && this.allowedValues == other.allowedValues && this.converter == other.converter;
+    }
 }
